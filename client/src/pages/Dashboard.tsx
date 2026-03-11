@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import TiltedCard from '../components/TiltedCard';
 
 const features = [
@@ -7,6 +8,7 @@ const features = [
     description: 'AI-powered navigation & routing system',
     imageSrc: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&h=400&fit=crop',
     badge: 'Navigation',
+    route: '',
   },
   {
     id: 'crowd-detection',
@@ -14,6 +16,7 @@ const features = [
     description: 'Real-time crowd density monitoring',
     imageSrc: 'https://images.unsplash.com/photo-1541535881652-c7fb6e252778?w=400&h=400&fit=crop',
     badge: 'Live',
+    route: '',
   },
   {
     id: 'gun-detection',
@@ -21,6 +24,7 @@ const features = [
     description: 'Real-time weapon identification system',
     imageSrc: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400&h=400&fit=crop',
     badge: 'Security',
+    route: '/weapon-detection',
   },
   {
     id: 'image-recognition',
@@ -28,6 +32,7 @@ const features = [
     description: 'Advanced image processing & analysis',
     imageSrc: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&h=400&fit=crop',
     badge: 'AI',
+    route: '',
   },
   {
     id: 'lost-and-found',
@@ -35,6 +40,7 @@ const features = [
     description: 'Facial recognition for missing persons',
     imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
     badge: 'Biometric',
+    route: '',
   },
   {
     id: 'disaster-prediction',
@@ -42,6 +48,7 @@ const features = [
     description: 'Mahakumbh disaster forecasting system',
     imageSrc: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=400&fit=crop',
     badge: 'Prediction',
+    route: '',
   },
   {
     id: 'peoples',
@@ -49,6 +56,7 @@ const features = [
     description: 'People counting and flow analysis',
     imageSrc: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop',
     badge: 'Analytics',
+    route: '',
   },
   {
     id: 'trinetra',
@@ -56,6 +64,7 @@ const features = [
     description: 'Main surveillance and control system',
     imageSrc: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=400&fit=crop',
     badge: 'Core',
+    route: '',
   },
 ];
 
@@ -63,6 +72,8 @@ const CARD_W = 220;
 const CARD_H = 260;
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   return (
     <div style={{ paddingTop: '5rem', minHeight: '100vh', background: '#050508' }}>
       {/* Header */}
@@ -90,7 +101,11 @@ export default function Dashboard() {
         padding: '2.5rem 2rem 6rem',
       }}>
         {features.map((feature) => (
-          <div key={feature.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+          <div
+            key={feature.id}
+            onClick={() => feature.route && navigate(feature.route)}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', cursor: feature.route ? 'pointer' : 'default' }}
+          >
             <TiltedCard
               imageSrc={feature.imageSrc}
               altText={feature.title}
