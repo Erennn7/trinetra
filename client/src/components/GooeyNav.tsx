@@ -160,6 +160,8 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
           border-radius: 9999px;
           padding: 4px 8px;
           display: inline-flex;
+          position: relative;
+          overflow: hidden;
         }
         .effect {
           position: absolute;
