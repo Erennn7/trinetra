@@ -40,7 +40,7 @@ const features = [
     description: 'Facial recognition for missing persons',
     imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
     badge: 'Biometric',
-    route: '',
+    route: '/lost-and-found',
   },
   {
     id: 'disaster-prediction',

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -35,6 +35,7 @@ interface AnalysisResponse {
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 const API_URL = 'http://localhost:5002';
+const STREAM_WEBRTC_URL = 'http://localhost:8889/webcam/';
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string; icon: string; label: string }> = {
   safe:     { color: '#22c55e', bg: 'rgba(34,197,94,0.10)',  border: 'rgba(34,197,94,0.3)',  icon: '✓', label: 'Safe' },
@@ -79,8 +80,18 @@ export default function WeaponDetection() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Mode: 'stream' (live RTSP) or 'video' (upload file)
+  const [mode, setMode] = useState<'stream' | 'video'>('stream');
+
+  // Video mode state
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+
+  // Stream parameters
+  const [scanDuration, setScanDuration] = useState(30);
+  const [intervalSec, setIntervalSec] = useState(3);
+
+  // Common state
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
@@ -88,7 +99,44 @@ export default function WeaponDetection() {
   const [selectedFrame, setSelectedFrame] = useState<FrameResult | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
-  // ── File handling ───────────────────────────────────────────────────────
+  // Live stream
+  const [streamOnline, setStreamOnline] = useState(false);
+  const iframeKey = useRef(0);
+  const [iframeReloadKey, setIframeReloadKey] = useState(0);
+
+  // ── WHEP probe for stream online/offline ─────────────────────────────
+  useEffect(() => {
+    if (mode !== 'stream') return;
+
+    let cancelled = false;
+    let wasOnline = false;
+
+    const checkStream = async () => {
+      try {
+        const res = await fetch(`${STREAM_WEBRTC_URL}whep`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/sdp' },
+          body: 'v=0',
+        });
+        if (cancelled) return;
+        const online = res.status !== 404;
+        if (online && !wasOnline) {
+          iframeKey.current += 1;
+          setIframeReloadKey(iframeKey.current);
+        }
+        wasOnline = online;
+        setStreamOnline(online);
+      } catch {
+        if (!cancelled) { wasOnline = false; setStreamOnline(false); }
+      }
+    };
+
+    checkStream();
+    const interval = setInterval(checkStream, 5000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [mode]);
+
+  // ── File handling (video mode) ──────────────────────────────────────
   const handleFile = useCallback((f: File) => {
     const ext = f.name.split('.').pop()?.toLowerCase() || '';
     if (!ALLOWED_EXT.includes(ext)) {
@@ -104,10 +152,7 @@ export default function WeaponDetection() {
     setResult(null);
     setSelectedFrame(null);
 
-    // Generate preview
-    if (f.type.startsWith('image/')) {
-      setPreview(URL.createObjectURL(f));
-    } else if (f.type.startsWith('video/')) {
+    if (f.type.startsWith('image/') || f.type.startsWith('video/')) {
       setPreview(URL.createObjectURL(f));
     } else {
       setPreview(null);
@@ -124,7 +169,7 @@ export default function WeaponDetection() {
     if (e.dataTransfer.files?.[0]) handleFile(e.dataTransfer.files[0]);
   };
 
-  // ── Upload & Analyze ───────────────────────────────────────────────────
+  // ── Analyze uploaded file (video mode) ─────────────────────────────
   const analyze = async () => {
     if (!file) return;
     setLoading(true);
@@ -133,7 +178,6 @@ export default function WeaponDetection() {
     setSelectedFrame(null);
     setProgress(0);
 
-    // Fake progress animation while waiting
     const interval = setInterval(() => {
       setProgress((p) => (p >= 90 ? 90 : p + Math.random() * 8));
     }, 600);
@@ -155,7 +199,50 @@ export default function WeaponDetection() {
         setError(data.error || 'Analysis failed. Please try again.');
       } else {
         setResult(data);
-        // Auto-select first threat frame if any
+        const firstThreat = data.results.find(
+          (r) => r.analysis.status !== 'safe' && r.analysis.status !== 'error'
+        );
+        setSelectedFrame(firstThreat || data.results[0] || null);
+      }
+    } catch (err: unknown) {
+      clearInterval(interval);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Network error: ${message}. Make sure the API is running at ${API_URL}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ── Scan live stream (stream mode) ─────────────────────────────────
+  const analyzeStream = async () => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    setSelectedFrame(null);
+    setProgress(0);
+
+    const interval = setInterval(() => {
+      setProgress((p) => (p >= 90 ? 90 : p + Math.random() * 3));
+    }, 1000);
+
+    try {
+      const formData = new FormData();
+      formData.append('max_seconds', scanDuration.toString());
+      formData.append('interval_sec', intervalSec.toString());
+
+      const res = await fetch(`${API_URL}/analyze-stream`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data: AnalysisResponse = await res.json();
+      clearInterval(interval);
+      setProgress(100);
+
+      if (!res.ok || !data.success) {
+        setError(data.error || 'Stream analysis failed.');
+      } else {
+        setResult(data);
         const firstThreat = data.results.find(
           (r) => r.analysis.status !== 'safe' && r.analysis.status !== 'error'
         );
@@ -180,7 +267,7 @@ export default function WeaponDetection() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // ── Computed Stats ─────────────────────────────────────────────────────
+  // ── Computed Stats ─────────────────────────────────────────────────
   const stats = result
     ? {
         total: result.total_frames,
@@ -204,11 +291,11 @@ export default function WeaponDetection() {
           : 'safe'
     : null;
 
-  // ── Render ─────────────────────────────────────────────────────────────
+  // ── Render ─────────────────────────────────────────────────────────
   return (
     <div style={{ paddingTop: '5rem', minHeight: '100vh', background: '#050508' }}>
       {/* Header */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 2rem 0' }}>
+      <div style={{ maxWidth: mode === 'stream' ? '1600px' : '1200px', margin: '0 auto', padding: '2rem 2rem 0', transition: 'max-width 0.3s' }}>
         <button
           onClick={() => navigate('/dashboard')}
           style={{
@@ -217,8 +304,8 @@ export default function WeaponDetection() {
             cursor: 'pointer', marginBottom: '1.5rem', transition: 'all 0.2s',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(167,139,250,0.4)';
-            e.currentTarget.style.color = '#c4b5fd';
+            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)';
+            e.currentTarget.style.color = '#fca5a5';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
@@ -246,14 +333,44 @@ export default function WeaponDetection() {
           </div>
         </div>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', marginTop: '0.25rem', marginBottom: '1.5rem' }}>
-          Upload CCTV footage or images. AI will analyze each frame for weapons, fighting, fire, and suspicious activity.
+          Scan the live CCTV stream or upload footage. AI analyzes each frame for weapons, fighting, fire, and suspicious activity.
         </p>
         <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(239,68,68,0.3), transparent)' }} />
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
-        {/* ── Upload Area ─────────────────────────────────────────────── */}
+      <div style={{ maxWidth: mode === 'stream' ? '1600px' : '1200px', margin: '0 auto', padding: '2rem', transition: 'max-width 0.3s' }}>
+        <div style={{
+          display: mode === 'stream' ? 'grid' : 'block',
+          gridTemplateColumns: mode === 'stream' ? '1fr 400px' : '1fr',
+          gap: '1.5rem',
+          alignItems: 'start',
+        }}>
+          {/* ═══ Left Column — Controls & Results ═══ */}
+          <div>
+        {/* ── Mode Selector ───────────────────────────────────────── */}
         {!result && (
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
+            {(['stream', 'video'] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMode(m); setError(null); }}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
+                  background: mode === m
+                    ? (m === 'stream' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #8b5cf6, #6d28d9)')
+                    : 'rgba(255,255,255,0.04)',
+                  color: mode === m ? '#fff' : 'rgba(255,255,255,0.4)',
+                  fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.3s',
+                }}
+              >
+                {m === 'stream' ? '📡  Live Stream Scan' : '🎥  Upload Video'}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Upload Area (video mode) ────────────────────────────── */}
+        {mode === 'video' && !result && (
           <div style={{ display: 'grid', gridTemplateColumns: file ? '1fr 1fr' : '1fr', gap: '2rem', marginBottom: '2rem' }}>
             {/* Dropzone */}
             <div
@@ -262,9 +379,9 @@ export default function WeaponDetection() {
               onDrop={onDrop}
               onClick={() => fileInputRef.current?.click()}
               style={{
-                border: `2px dashed ${dragActive ? '#a78bfa' : 'rgba(255,255,255,0.1)'}`,
+                border: `2px dashed ${dragActive ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
                 borderRadius: '16px', padding: '3rem 2rem',
-                background: dragActive ? 'rgba(167,139,250,0.05)' : 'rgba(255,255,255,0.02)',
+                background: dragActive ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)',
                 cursor: 'pointer', transition: 'all 0.3s', textAlign: 'center',
                 minHeight: '280px', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
@@ -286,7 +403,7 @@ export default function WeaponDetection() {
                   <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginTop: '0.3rem' }}>
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
-                  <p style={{ color: 'rgba(167,139,250,0.7)', fontSize: '0.7rem', marginTop: '0.5rem' }}>
+                  <p style={{ color: 'rgba(239,68,68,0.7)', fontSize: '0.7rem', marginTop: '0.5rem' }}>
                     Click to change file
                   </p>
                 </>
@@ -331,23 +448,63 @@ export default function WeaponDetection() {
           </div>
         )}
 
-        {/* Analyze button */}
-        {file && !result && (
+        {/* ── Stream Parameters ────────────────────────────────────── */}
+        {mode === 'stream' && !result && (
+          <div style={{
+            display: 'grid', gridTemplateColumns: '1fr 1fr',
+            gap: '1rem', marginBottom: '1.5rem', padding: '1.25rem', borderRadius: '12px',
+            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+          }}>
+            <div>
+              <label style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Scan Duration ({scanDuration}s)
+              </label>
+              <input
+                type="range" min="10" max="120" step="5" value={scanDuration}
+                onChange={(e) => setScanDuration(parseInt(e.target.value))}
+                style={{ width: '100%', marginTop: '0.4rem', accentColor: '#ef4444' }}
+              />
+              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem', margin: '0.2rem 0 0' }}>
+                How long to scan the live stream
+              </p>
+            </div>
+            <div>
+              <label style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Snapshot Interval ({intervalSec}s)
+              </label>
+              <input
+                type="range" min="1" max="10" step="1" value={intervalSec}
+                onChange={(e) => setIntervalSec(parseInt(e.target.value))}
+                style={{ width: '100%', marginTop: '0.4rem', accentColor: '#ef4444' }}
+              />
+              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem', margin: '0.2rem 0 0' }}>
+                Seconds between each Gemini AI snapshot
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Action Buttons ───────────────────────────────────────── */}
+        {!result && (mode === 'stream' || (mode === 'video' && file)) && (
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
             <button
-              onClick={analyze}
+              onClick={mode === 'stream' ? analyzeStream : analyze}
               disabled={loading}
               style={{
                 flex: 1, padding: '14px 28px', borderRadius: '12px', border: 'none',
                 background: loading
                   ? 'rgba(239,68,68,0.3)'
-                  : 'linear-gradient(135deg, #ef4444, #dc2626)',
+                  : mode === 'stream'
+                    ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+                    : 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
                 color: '#fff', fontWeight: 700, fontSize: '0.95rem',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s', letterSpacing: '0.03em',
               }}
             >
-              {loading ? 'Analyzing…' : '🔍  Analyze for Threats'}
+              {loading
+                ? (mode === 'stream' ? 'Scanning Live Stream…' : 'Analyzing…')
+                : (mode === 'stream' ? '📡  Scan Live Stream for Threats' : '��  Analyze for Threats')}
             </button>
             {!loading && (
               <button
@@ -365,7 +522,7 @@ export default function WeaponDetection() {
           </div>
         )}
 
-        {/* Progress bar */}
+        {/* ── Progress bar ─────────────────────────────────────────── */}
         {loading && (
           <div style={{ marginBottom: '2rem' }}>
             <div style={{
@@ -379,12 +536,14 @@ export default function WeaponDetection() {
               }} />
             </div>
             <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem', marginTop: '0.5rem', textAlign: 'center' }}>
-              Analyzing frames with Gemini AI… This may take a minute for longer videos.
+              {mode === 'stream'
+                ? `Scanning live stream for ~${scanDuration}s — sending snapshots to Gemini AI every ${intervalSec}s…`
+                : 'Analyzing frames with Gemini AI… This may take a minute for longer videos.'}
             </p>
           </div>
         )}
 
-        {/* Error */}
+        {/* ── Error ────────────────────────────────────────────────── */}
         {error && (
           <div style={{
             padding: '1rem 1.5rem', borderRadius: '12px', marginBottom: '2rem',
@@ -396,7 +555,9 @@ export default function WeaponDetection() {
           </div>
         )}
 
-        {/* ── Results ─────────────────────────────────────────────────── */}
+        {/* ══════════════════════════════════════════════════════════
+            RESULTS (shared for both modes)
+           ══════════════════════════════════════════════════════════ */}
         {result && stats && (
           <>
             {/* Overall summary bar */}
@@ -607,7 +768,118 @@ export default function WeaponDetection() {
             </div>
           </>
         )}
-      </div>
+          </div>
+
+          {/* ═══ Right Column — Live CCTV Stream ═══ */}
+          {mode === 'stream' && (
+            <div style={{
+              position: 'sticky', top: '6rem',
+              borderRadius: '16px', overflow: 'hidden',
+              border: '1px solid rgba(239,68,68,0.2)',
+              background: '#0a0b12',
+            }}>
+              {/* Header */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '0.75rem 1rem',
+                background: 'rgba(239,68,68,0.06)',
+                borderBottom: '1px solid rgba(239,68,68,0.15)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{
+                    width: '8px', height: '8px', borderRadius: '50%',
+                    background: streamOnline ? '#22c55e' : '#ef4444',
+                    boxShadow: streamOnline ? '0 0 8px #22c55e' : '0 0 8px #ef4444',
+                    animation: streamOnline ? 'pulse-dot 1.6s ease-in-out infinite' : 'none',
+                  }} />
+                  <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                    {streamOnline ? 'Live' : 'Offline'}
+                  </span>
+                </div>
+                <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem' }}>
+                  CCTV — webcam
+                </span>
+              </div>
+
+              {/* Video player */}
+              <div style={{ position: 'relative', background: '#000', minHeight: '240px' }}>
+                <iframe
+                  key={iframeReloadKey}
+                  src={STREAM_WEBRTC_URL}
+                  allow="autoplay"
+                  style={{ width: '100%', height: '240px', display: 'block', border: 'none' }}
+                />
+
+                {/* Offline overlay */}
+                {!streamOnline && (
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'rgba(0,0,0,0.85)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: '0.75rem',
+                  }}>
+                    <div style={{ fontSize: '2.5rem', opacity: 0.3 }}>📡</div>
+                    <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>
+                      Stream Offline
+                    </p>
+                    <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.68rem', margin: 0, textAlign: 'center', padding: '0 1rem' }}>
+                      Make sure MediaMTX & ffmpeg are running.
+                      <br />Retrying every 5 seconds…
+                    </p>
+                  </div>
+                )}
+
+                {/* Scanning overlay */}
+                {loading && mode === 'stream' && (
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    backdropFilter: 'blur(2px)',
+                  }}>
+                    <div style={{
+                      width: '50px', height: '50px', border: '3px solid rgba(239,68,68,0.3)',
+                      borderTop: '3px solid #ef4444', borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                    }} />
+                    <p style={{ color: '#fca5a5', fontSize: '0.78rem', fontWeight: 600, marginTop: '0.75rem' }}>
+                      Scanning stream…
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Info footer */}
+              <div style={{
+                padding: '0.6rem 1rem',
+                background: 'rgba(255,255,255,0.02)',
+                borderTop: '1px solid rgba(255,255,255,0.04)',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              }}>
+                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
+                  rtsp://localhost:8554/webcam
+                </span>
+                <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.6rem' }}>
+                  WebRTC · 720p
+                </span>
+              </div>
+            </div>
+          )}
+
+        </div>{/* end grid */}
+      </div>{/* end max-width container */}
+
+      {/* Keyframes */}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
     </div>
   );
 }
