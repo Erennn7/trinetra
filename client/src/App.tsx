@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import WeaponDetection from './pages/WeaponDetection';
+import CrowdDetection from './pages/CrowdDetection';
+import ImageRecognition from './pages/imageRecognition';
 import LostAndFound from './pages/LostAndFound';
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
@@ -35,6 +37,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/weapon-detection" element={<WeaponDetection />} />
           <Route path="/lost-and-found" element={<LostAndFound />} />
+          <Route path="/crowd-detection" element={<CrowdDetection />} />
+          <Route path="/image-recognition" element={<ImageRecognition />} />
         </Routes>
         <Footer2 />
       </div>

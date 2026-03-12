@@ -16,7 +16,7 @@ const features = [
     description: 'Real-time crowd density monitoring',
     imageSrc: 'https://images.unsplash.com/photo-1541535881652-c7fb6e252778?w=400&h=400&fit=crop',
     badge: 'Live',
-    route: '',
+    route: '/crowd-detection',
   },
   {
     id: 'gun-detection',
@@ -32,7 +32,7 @@ const features = [
     description: 'Advanced image processing & analysis',
     imageSrc: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&h=400&fit=crop',
     badge: 'AI',
-    route: '',
+    route: '/image-recognition',
   },
   {
     id: 'lost-and-found',
@@ -51,11 +51,11 @@ const features = [
     route: '',
   },
   {
-    id: 'peoples',
-    title: 'People Analytics',
-    description: 'People counting and flow analysis',
+    id: 'Doctor Assistance',
+    title: 'Doctor Assistance',
+    description: 'Realtime Doctor Assistance system',
     imageSrc: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop',
-    badge: 'Analytics',
+    badge: 'Health',
     route: '',
   },
   {
