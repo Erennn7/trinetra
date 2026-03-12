@@ -121,6 +121,24 @@ const features: Feature[] = [
     route: '/doctor-assistance',
     roles: ['medical_admin'],
   },
+  {
+    id: 'doctor-my-appointments',
+    title: 'My Appointments',
+    description: 'View & manage your patient appointments',
+    imageSrc: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=400&fit=crop',
+    badge: 'Doctor',
+    route: '/doctor-assistance',
+    roles: ['doctor'],
+  },
+  {
+    id: 'doctor-profile',
+    title: 'Doctor Assistance',
+    description: 'View patient queue & doctor directory',
+    imageSrc: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop',
+    badge: 'Doctor',
+    route: '/doctor-assistance',
+    roles: ['doctor'],
+  },
 ];
 
 const CARD_W = 220;
@@ -130,6 +148,7 @@ const ROLE_LABELS: Record<Role, string> = {
   admin: 'Admin Dashboard',
   user: 'User Dashboard',
   medical_admin: 'Medical Admin Dashboard',
+  doctor: 'Doctor Dashboard',
 };
 
 export default function Dashboard() {

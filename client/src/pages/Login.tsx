@@ -132,6 +132,12 @@ export default function Login() {
             Register
           </Link>
         </p>
+        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem', textAlign: 'center', marginTop: '0.5rem' }}>
+          Are you a doctor?{' '}
+          <Link to="/doctor-signup" style={{ color: '#4ade80', textDecoration: 'none', fontWeight: 600 }}>
+            Sign up as Doctor 🩺
+          </Link>
+        </p>
       </div>
     </div>
   );

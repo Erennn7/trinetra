@@ -11,6 +11,7 @@ import ImageRecognition from './pages/ImageRecognition';
 import LostAndFound from './pages/LostAndFound';
 import DoctorRegistration from './pages/DoctorRegistration';
 import DoctorAssistance from './pages/DoctorAssistance';
+import DoctorSignup from './pages/DoctorSignup';
 import PilgrimTracker from './pages/PilgrimTracker';
 import DisasterPrediction from './pages/DisasterPrediction';
 import DisasterManagement from './pages/DisasterManagement';
@@ -49,6 +50,7 @@ function App() {
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/doctor-signup" element={<DoctorSignup />} />
 
             {/* Shared protected routes */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -64,7 +66,7 @@ function App() {
             {/* User routes */}
             <Route path="/pilgrim-tracker" element={<ProtectedRoute allowedRoles={['user']}><PilgrimTracker /></ProtectedRoute>} />
             <Route path="/disaster-management" element={<ProtectedRoute allowedRoles={['user']}><DisasterManagement /></ProtectedRoute>} />
-            <Route path="/doctor-assistance" element={<ProtectedRoute allowedRoles={['user', 'medical_admin']}><DoctorAssistance /></ProtectedRoute>} />
+            <Route path="/doctor-assistance" element={<ProtectedRoute allowedRoles={['user', 'medical_admin', 'doctor']}><DoctorAssistance /></ProtectedRoute>} />
             <Route path="/doctor-registration" element={<ProtectedRoute allowedRoles={['user']}><DoctorRegistration /></ProtectedRoute>} />
             <Route path="/ai-map" element={<ProtectedRoute allowedRoles={['user']}><AIMap /></ProtectedRoute>} />
 
