@@ -28,7 +28,7 @@ import { useAuth } from './context/AuthContext';
 
 const navItems = [
   { label: 'Home', href: 'http://localhost:3000/' },
-  { label: 'Dashboard', href: 'http://localhost:5173/#' },
+  { label: 'Dashboard', href: '#/dashboard' },
   { label: 'About', href: '#' },
 ];
 

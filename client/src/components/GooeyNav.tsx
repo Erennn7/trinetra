@@ -100,7 +100,9 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
     textRef.current.innerText = element.innerText;
   };
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, index: number) => {
+    e.preventDefault();
     const liEl = (e.currentTarget as HTMLElement).closest('li') as HTMLElement;
+    const href = items[index].href;
     if (activeIndex === index) return;
     setActiveIndex(index);
     updateEffectPosition(liEl);
@@ -115,6 +117,16 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
     }
     if (filterRef.current) {
       makeParticles(filterRef.current);
+    }
+    if (href && href !== '#') {
+      setTimeout(() => {
+        // Handle hash-based routes (same domain) vs external URLs
+        if (href.startsWith('#')) {
+          window.location.hash = href;
+        } else {
+          window.location.href = href;
+        }
+      }, animationTime);
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>, index: number) => {
