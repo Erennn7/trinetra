@@ -16,6 +16,7 @@ import PilgrimTracker from './pages/PilgrimTracker';
 import DisasterPrediction from './pages/DisasterPrediction';
 import DisasterManagement from './pages/DisasterManagement';
 import AIMap from './pages/AIMap';
+import Analytics from './pages/Analytics';
 
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
@@ -62,6 +63,7 @@ function App() {
             <Route path="/crowd-detection" element={<ProtectedRoute allowedRoles={['admin']}><CrowdDetection /></ProtectedRoute>} />
             <Route path="/image-recognition" element={<ProtectedRoute allowedRoles={['admin']}><ImageRecognition /></ProtectedRoute>} />
             <Route path="/disaster-prediction" element={<ProtectedRoute allowedRoles={['admin']}><DisasterPrediction /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute allowedRoles={['admin']}><Analytics /></ProtectedRoute>} />
 
             {/* User routes */}
             <Route path="/pilgrim-tracker" element={<ProtectedRoute allowedRoles={['user']}><PilgrimTracker /></ProtectedRoute>} />

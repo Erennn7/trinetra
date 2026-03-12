@@ -59,6 +59,15 @@ const features: Feature[] = [
     roles: ['admin'],
   },
   {
+    id: 'analytics',
+    title: 'Analytics',
+    description: 'All users, doctors & role-wise stats',
+    imageSrc: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=400&fit=crop',
+    badge: 'Insights',
+    route: '/analytics',
+    roles: ['admin'],
+  },
+  {
     id: 'pilgrim-tracker',
     title: 'Pilgrim Tracker',
     description: 'Real-time pilgrim location tracking',
