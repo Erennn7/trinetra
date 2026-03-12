@@ -8,7 +8,8 @@ import Register from './pages/Register';
 import WeaponDetection from './pages/WeaponDetection';
 import CrowdDetection from './pages/CrowdDetection';
 import ImageRecognition from './pages/ImageRecognition';
-import LostAndFound from './pages/LostAndFound';
+import UserLostAndFound from './pages/UserLostAndFound';
+import AdminLostAndFound from './pages/AdminLostAndFound';
 import DoctorRegistration from './pages/DoctorRegistration';
 import DoctorAssistance from './pages/DoctorAssistance';
 import DoctorSignup from './pages/DoctorSignup';
@@ -81,7 +82,10 @@ function App() {
             {/* Shared protected routes */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/lost-and-found" element={<ProtectedRoute allowedRoles={['admin', 'user']}><LostAndFound /></ProtectedRoute>} />
+            
+            {/* Lost & Found - different pages for user vs admin */}
+            <Route path="/lost-and-found" element={<ProtectedRoute allowedRoles={['admin']}><AdminLostAndFound /></ProtectedRoute>} />
+            <Route path="/report-missing" element={<ProtectedRoute allowedRoles={['user']}><UserLostAndFound /></ProtectedRoute>} />
 
             {/* Admin-only routes */}
             <Route path="/weapon-detection" element={<ProtectedRoute allowedRoles={['admin']}><WeaponDetection /></ProtectedRoute>} />

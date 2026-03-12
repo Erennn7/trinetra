@@ -16,13 +16,22 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    id: 'lost-and-found',
+    id: 'lost-and-found-admin',
     title: 'Lost & Found',
-    description: 'Facial recognition for missing persons',
+    description: 'Process missing person search requests',
     imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
     badge: 'Biometric',
     route: '/lost-and-found',
-    roles: ['admin', 'user'],
+    roles: ['admin'],
+  },
+  {
+    id: 'report-missing',
+    title: 'Report Missing Person',
+    description: 'Submit a search request for a lost person',
+    imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    badge: 'Search',
+    route: '/report-missing',
+    roles: ['user'],
   },
   {
     id: 'crowd-detection',
