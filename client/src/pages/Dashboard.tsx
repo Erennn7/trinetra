@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth, type Role } from '../context/AuthContext';
 import TiltedCard from '../components/TiltedCard';
-import { ModeToggle } from '../components/mode-toggle';
 import Squares from '../components/Squares';
 import { useTheme } from '../components/use-theme';
 
@@ -165,7 +164,7 @@ const ROLE_LABELS: Record<Role, string> = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { profile, logout } = useAuth();
+  const { profile } = useAuth();
   const role = profile?.role ?? null;
   const { theme } = useTheme();
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -200,26 +199,7 @@ export default function Dashboard() {
             {visibleFeatures.length} active modules — select one to manage
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <ModeToggle />
-          <button
-            onClick={async () => { await logout(); navigate('/login'); }}
-            style={{
-              padding: '0.5rem 1.2rem',
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '8px',
-              color: 'rgba(255,255,255,0.5)',
-              fontSize: '0.78rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'; e.currentTarget.style.color = '#f87171'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
-          >
-            Logout
-          </button>
-        </div>
+
       </div>
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
         <div style={{ marginTop: '1.5rem', height: '1px', background: 'linear-gradient(to right, rgba(255,255,255,0.08), transparent)' }} />

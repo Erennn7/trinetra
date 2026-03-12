@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -21,6 +21,9 @@ import Analytics from './pages/Analytics';
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
 import { ThemeProvider } from "@/components/theme-provider"
+import { ModeToggle } from './components/mode-toggle';
+import { Avatar, AvatarFallback } from './components/ui/avatar';
+import { useAuth } from './context/AuthContext';
 
 const navItems = [
   { label: 'Home', href: 'http://localhost:3000/' },
@@ -28,28 +31,47 @@ const navItems = [
   { label: 'About', href: '#' },
 ];
 
+function NavBar() {
+  const { profile, logout } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
+      <a href="http://localhost:3000" style={{ color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <GooeyNav
+          items={navItems}
+          particleCount={15}
+          particleDistances={[90, 10]}
+          particleR={100}
+          initialActiveIndex={1}
+          animationTime={600}
+          timeVariance={300}
+          colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+        />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', width: '100px', justifyContent: 'flex-end' }}>
+        <ModeToggle />
+        {profile && (
+          <Avatar style={{ cursor: 'pointer' }} onClick={async () => { await logout(); navigate('/login'); }}>
+            <AvatarFallback>
+              {profile.name
+                ? profile.name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2)
+                : '?'}
+            </AvatarFallback>
+          </Avatar>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <AuthProvider>
         <div style={{ minHeight: '100vh', background: 'hsl(var(--background))' }}>
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
-            <a href="http://localhost:3000" style={{ color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <GooeyNav
-                items={navItems}
-                particleCount={15}
-                particleDistances={[90, 10]}
-                particleR={100}
-                initialActiveIndex={1}
-                animationTime={600}
-                timeVariance={300}
-                colors={[1, 2, 3, 1, 2, 3, 1, 4]}
-              />
-            </div>
-            <div style={{ width: '100px' }} />
-          </div>
+          <NavBar />
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
