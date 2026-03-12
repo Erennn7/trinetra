@@ -8,9 +8,9 @@ import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
 
 const navItems = [
-  { label: 'Dashboard', href: 'http://localhost:5173/dashboard#' },
+  { label: 'Home', href: 'http://localhost:3000/' },
+  { label: 'Dashboard', href: 'http://localhost:5173/#' },
   { label: 'About', href: '#' },
-  { label: 'Contact', href: '#' },
 ];
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
             particleCount={15}
             particleDistances={[90, 10]}
             particleR={100}
-            initialActiveIndex={0}
+            initialActiveIndex={1}
             animationTime={600}
             timeVariance={300}
             colors={[1, 2, 3, 1, 2, 3, 1, 4]}

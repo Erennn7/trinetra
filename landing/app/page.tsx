@@ -6,8 +6,8 @@ import CTASection from './components/CTASection';
 import { Footer2 } from './components/Footer2';
 
 const navItems = [
+  { label: 'Home', href: 'http://localhost:3000/' },
   { label: 'Dashboard', href: 'http://localhost:5173/dashboard#' },
-  { label: 'Technology', href: '#technology' },
   { label: 'About', href: '#about' },
 ];
 
