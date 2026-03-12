@@ -85,33 +85,37 @@ const sidebarSections: SidebarSection[] = [
     ],
   },
   {
-    title: 'Health',
-    roles: ['user', 'doctor'],
-    items: [
-      { id: 'doctor-assistance-user', label: 'Doctor Assistance', icon: Stethoscope, route: '/doctor-assistance', roles: ['user', 'doctor'] },
-      { id: 'doctor-reg', label: 'Register as Doctor', icon: UserPlus, route: '/doctor-registration', roles: ['user'] },
-    ],
-  },
-  {
     title: 'Emergency',
     roles: ['user'],
     items: [
       { id: 'disaster-management', label: 'Disaster Management', icon: AlertTriangle, route: '/disaster-management', roles: ['user'] },
+      { id: 'emergency-call', label: 'Emergency Video Call', icon: Video, route: '/emergency-call', roles: ['user'] },
+    ],
+  },
+  {
+    title: 'Health',
+    roles: ['user'],
+    items: [
+      { id: 'doctor-reg', label: 'Register as Doctor', icon: UserPlus, route: '/doctor-registration', roles: ['user'] },
     ],
   },
   {
     title: 'Administration',
     roles: ['medical_admin'],
     items: [
-      { id: 'appt-queue', label: 'Appointment Queue', icon: ClipboardList, route: '/doctor-assistance', roles: ['medical_admin'] },
-      { id: 'reg-doctors', label: 'Registered Doctors', icon: UserCheck, route: '/doctor-assistance', roles: ['medical_admin'] },
+      { id: 'medical-admin', label: 'Medical Panel', icon: LayoutDashboard, route: '/medical-admin', roles: ['medical_admin'] },
+      { id: 'medical-video-queue', label: 'Video Call Queue', icon: Video, route: '/medical-admin/video-queue', roles: ['medical_admin'] },
+      { id: 'medical-doctors', label: 'Manage Doctors', icon: UserCheck, route: '/medical-admin/doctors', roles: ['medical_admin'] },
+      { id: 'medical-hospitals', label: 'Hospitals', icon: ClipboardList, route: '/medical-admin/hospitals', roles: ['medical_admin'] },
     ],
   },
   {
     title: 'Practice',
     roles: ['doctor'],
     items: [
-      { id: 'my-appointments', label: 'My Appointments', icon: Calendar, route: '/doctor-assistance', roles: ['doctor'] },
+      { id: 'doctor-panel', label: 'Doctor Panel', icon: LayoutDashboard, route: '/doctor-panel', roles: ['doctor'] },
+      { id: 'doctor-video-queue', label: 'Video Call Queue', icon: Video, route: '/doctor-panel/video-queue', roles: ['doctor'] },
+      { id: 'doctor-my-profile', label: 'My Profile', icon: UserCheck, route: '/doctor-panel/profile', roles: ['doctor'] },
     ],
   },
 ];
@@ -196,12 +200,15 @@ const featureModules: FeatureModule[] = [
   { id: 'pilgrim-tracker', title: 'Pilgrim Tracker', description: 'Real-time pilgrim location tracking', icon: MapPin, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', badge: 'Tracking', badgeClass: 'text-blue-400 bg-blue-400/10', route: '/pilgrim-tracker', roles: ['user'] },
   { id: 'ai-map', title: 'AI-Guided Map', description: 'AI-powered navigation & routing system', icon: Map, iconClass: 'text-emerald-400', iconBg: 'bg-emerald-500/10', badge: 'Navigation', badgeClass: 'text-emerald-400 bg-emerald-400/10', route: '/ai-map', roles: ['user'] },
   { id: 'disaster-management', title: 'Disaster Management', description: 'Emergency response & management portal', icon: AlertTriangle, iconClass: 'text-amber-400', iconBg: 'bg-amber-500/10', badge: 'Emergency', badgeClass: 'text-amber-400 bg-amber-400/10', route: '/disaster-management', roles: ['user'] },
-  { id: 'doctor-assistance', title: 'Doctor Assistance', description: 'Find doctors & book appointments', icon: Stethoscope, iconClass: 'text-pink-400', iconBg: 'bg-pink-500/10', badge: 'Health', badgeClass: 'text-pink-400 bg-pink-400/10', route: '/doctor-assistance', roles: ['user'] },
+  { id: 'emergency-call', title: 'Emergency Video Call', description: 'Request an emergency video consultation', icon: Video, iconClass: 'text-red-400', iconBg: 'bg-red-500/10', badge: 'Emergency', badgeClass: 'text-red-400 bg-red-400/10', route: '/emergency-call', roles: ['user'] },
   { id: 'doctor-registration', title: 'Register as Doctor', description: 'Register yourself as a medical practitioner', icon: UserPlus, iconClass: 'text-cyan-400', iconBg: 'bg-cyan-500/10', badge: 'Health', badgeClass: 'text-cyan-400 bg-cyan-400/10', route: '/doctor-registration', roles: ['user'] },
-  { id: 'appt-queue', title: 'Appointment Queue', description: 'Manage doctors & appointment queue', icon: ClipboardList, iconClass: 'text-violet-400', iconBg: 'bg-violet-500/10', badge: 'Admin', badgeClass: 'text-violet-400 bg-violet-400/10', route: '/doctor-assistance', roles: ['medical_admin'] },
-  { id: 'reg-doctors', title: 'Registered Doctors', description: 'View & manage all registered doctors', icon: UserCheck, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', badge: 'Admin', badgeClass: 'text-blue-400 bg-blue-400/10', route: '/doctor-assistance', roles: ['medical_admin'] },
-  { id: 'my-appointments', title: 'My Appointments', description: 'View & manage your patient appointments', icon: Calendar, iconClass: 'text-violet-400', iconBg: 'bg-violet-500/10', badge: 'Doctor', badgeClass: 'text-violet-400 bg-violet-400/10', route: '/doctor-assistance', roles: ['doctor'] },
-  { id: 'doctor-profile', title: 'Doctor Assistance', description: 'View patient queue & doctor directory', icon: Stethoscope, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', badge: 'Doctor', badgeClass: 'text-blue-400 bg-blue-400/10', route: '/doctor-assistance', roles: ['doctor'] },
+  { id: 'medical-admin', title: 'Medical Admin Panel', description: 'Manage doctors, hospitals & emergency queue', icon: LayoutDashboard, iconClass: 'text-violet-400', iconBg: 'bg-violet-500/10', badge: 'Admin', badgeClass: 'text-violet-400 bg-violet-400/10', route: '/medical-admin', roles: ['medical_admin'] },
+  { id: 'medical-video-queue', title: 'Video Call Queue', description: 'Monitor emergency video call requests', icon: Video, iconClass: 'text-red-400', iconBg: 'bg-red-500/10', badge: 'Emergency', badgeClass: 'text-red-400 bg-red-400/10', route: '/medical-admin/video-queue', roles: ['medical_admin'] },
+  { id: 'medical-doctors', title: 'Manage Doctors', description: 'View & manage all registered doctors', icon: UserCheck, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', badge: 'Admin', badgeClass: 'text-blue-400 bg-blue-400/10', route: '/medical-admin/doctors', roles: ['medical_admin'] },
+  { id: 'medical-hospitals', title: 'Hospitals', description: 'Manage hospitals & bed availability', icon: ClipboardList, iconClass: 'text-emerald-400', iconBg: 'bg-emerald-500/10', badge: 'Admin', badgeClass: 'text-emerald-400 bg-emerald-400/10', route: '/medical-admin/hospitals', roles: ['medical_admin'] },
+  { id: 'doctor-panel', title: 'Doctor Panel', description: 'Overview & emergency video calls', icon: LayoutDashboard, iconClass: 'text-violet-400', iconBg: 'bg-violet-500/10', badge: 'Doctor', badgeClass: 'text-violet-400 bg-violet-400/10', route: '/doctor-panel', roles: ['doctor'] },
+  { id: 'doctor-video-queue', title: 'Video Call Queue', description: 'Accept emergency video calls from patients', icon: Video, iconClass: 'text-red-400', iconBg: 'bg-red-500/10', badge: 'Emergency', badgeClass: 'text-red-400 bg-red-400/10', route: '/doctor-panel/video-queue', roles: ['doctor'] },
+  { id: 'doctor-my-profile', title: 'My Profile', description: 'View your doctor profile & availability', icon: UserCheck, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', badge: 'Doctor', badgeClass: 'text-blue-400 bg-blue-400/10', route: '/doctor-panel/profile', roles: ['doctor'] },
 ];
 
 /* ------------------------------------------------------------------ */
