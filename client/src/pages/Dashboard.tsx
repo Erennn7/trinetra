@@ -1,14 +1,26 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth, type Role } from '../context/AuthContext';
 import TiltedCard from '../components/TiltedCard';
 
-const features = [
+interface Feature {
+  id: string;
+  title: string;
+  description: string;
+  imageSrc: string;
+  badge: string;
+  route: string;
+  roles: Role[];
+}
+
+const features: Feature[] = [
   {
-    id: 'ai-guided-map',
-    title: 'AI-Guided Map',
-    description: 'AI-powered navigation & routing system',
-    imageSrc: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&h=400&fit=crop',
-    badge: 'Navigation',
-    route: '',
+    id: 'lost-and-found',
+    title: 'Lost & Found',
+    description: 'Facial recognition for missing persons',
+    imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    badge: 'Biometric',
+    route: '/lost-and-found',
+    roles: ['admin', 'user'],
   },
   {
     id: 'crowd-detection',
@@ -17,6 +29,7 @@ const features = [
     imageSrc: 'https://images.unsplash.com/photo-1541535881652-c7fb6e252778?w=400&h=400&fit=crop',
     badge: 'Live',
     route: '/crowd-detection',
+    roles: ['admin'],
   },
   {
     id: 'gun-detection',
@@ -25,6 +38,7 @@ const features = [
     imageSrc: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400&h=400&fit=crop',
     badge: 'Security',
     route: '/weapon-detection',
+    roles: ['admin'],
   },
   {
     id: 'image-recognition',
@@ -33,60 +47,135 @@ const features = [
     imageSrc: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&h=400&fit=crop',
     badge: 'AI',
     route: '/image-recognition',
-  },
-  {
-    id: 'lost-and-found',
-    title: 'Lost & Found',
-    description: 'Facial recognition for missing persons',
-    imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-    badge: 'Biometric',
-    route: '/lost-and-found',
+    roles: ['admin'],
   },
   {
     id: 'disaster-prediction',
     title: 'Disaster Prediction',
-    description: 'Mahakumbh disaster forecasting system',
+    description: 'Disaster forecasting system',
     imageSrc: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=400&fit=crop',
     badge: 'Prediction',
-    route: '',
+    route: '/disaster-prediction',
+    roles: ['admin'],
   },
   {
-    id: 'Doctor Assistance',
+    id: 'pilgrim-tracker',
+    title: 'Pilgrim Tracker',
+    description: 'Real-time pilgrim location tracking',
+    imageSrc: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=400&h=400&fit=crop',
+    badge: 'Tracking',
+    route: '/pilgrim-tracker',
+    roles: ['user'],
+  },
+  {
+    id: 'disaster-management',
+    title: 'Disaster Management',
+    description: 'Emergency response & management portal',
+    imageSrc: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
+    badge: 'Emergency',
+    route: '/disaster-management',
+    roles: ['user'],
+  },
+  {
+    id: 'doctor-assistance',
     title: 'Doctor Assistance',
-    description: 'Realtime Doctor Assistance system',
-    imageSrc: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop',
+    description: 'Find doctors & book appointments',
+    imageSrc: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop',
     badge: 'Health',
-    route: '',
+    route: '/doctor-assistance',
+    roles: ['user'],
   },
   {
-    id: 'trinetra',
-    title: 'Trinetra Core',
-    description: 'Main surveillance and control system',
-    imageSrc: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=400&fit=crop',
-    badge: 'Core',
-    route: '',
+    id: 'doctor-registration',
+    title: 'Register as Doctor',
+    description: 'Register yourself as a medical practitioner',
+    imageSrc: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&h=400&fit=crop',
+    badge: 'Health',
+    route: '/doctor-registration',
+    roles: ['user'],
+  },
+  {
+    id: 'ai-guided-map',
+    title: 'AI-Guided Map',
+    description: 'AI-powered navigation & routing system',
+    imageSrc: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&h=400&fit=crop',
+    badge: 'Navigation',
+    route: '/ai-map',
+    roles: ['user'],
+  },
+  {
+    id: 'medical-admin-dashboard',
+    title: 'Appointment Queue',
+    description: 'Manage doctors & appointment queue',
+    imageSrc: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=400&fit=crop',
+    badge: 'Admin',
+    route: '/doctor-assistance',
+    roles: ['medical_admin'],
+  },
+  {
+    id: 'doctor-list',
+    title: 'Registered Doctors',
+    description: 'View & manage all registered doctors',
+    imageSrc: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop',
+    badge: 'Admin',
+    route: '/doctor-assistance',
+    roles: ['medical_admin'],
   },
 ];
 
 const CARD_W = 220;
 const CARD_H = 260;
 
+const ROLE_LABELS: Record<Role, string> = {
+  admin: 'Admin Dashboard',
+  user: 'User Dashboard',
+  medical_admin: 'Medical Admin Dashboard',
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { profile, logout } = useAuth();
+  const role = profile?.role ?? null;
+
+  const visibleFeatures = features.filter(
+    (f) => role && f.roles.includes(role),
+  );
 
   return (
     <div style={{ paddingTop: '5rem', minHeight: '100vh', background: '#050508' }}>
       {/* Header */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 2rem 1rem' }}>
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.7rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-          Admin Dashboard
-        </p>
-        <h1 style={{ color: '#fff', fontSize: '2.2rem', fontWeight: 700, margin: 0 }}>
-          Trinetra Feature Modules
-        </h1>
-        <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '0.4rem', fontSize: '0.9rem' }}>
-          {features.length} active modules — select one to manage
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.7rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+              {role ? ROLE_LABELS[role] : 'Dashboard'}
+            </p>
+            <h1 style={{ color: '#fff', fontSize: '2.2rem', fontWeight: 700, margin: 0 }}>
+              Trinetra Feature Modules
+            </h1>
+            <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '0.4rem', fontSize: '0.9rem' }}>
+              {visibleFeatures.length} active modules — select one to manage
+            </p>
+          </div>
+          <button
+            onClick={async () => { await logout(); navigate('/login'); }}
+            style={{
+              marginTop: '0.3rem',
+              padding: '0.5rem 1.2rem',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px',
+              color: 'rgba(255,255,255,0.5)',
+              fontSize: '0.78rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'; e.currentTarget.style.color = '#f87171'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+          >
+            Logout
+          </button>
+        </div>
         <div style={{ marginTop: '1.5rem', height: '1px', background: 'linear-gradient(to right, rgba(255,255,255,0.08), transparent)' }} />
       </div>
 
@@ -100,7 +189,7 @@ export default function Dashboard() {
         gap: '3rem 2.5rem',
         padding: '2.5rem 2rem 6rem',
       }}>
-        {features.map((feature) => (
+        {visibleFeatures.map((feature) => (
           <div
             key={feature.id}
             onClick={() => feature.route && navigate(feature.route)}
