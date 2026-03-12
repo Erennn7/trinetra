@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth, type Role } from '../context/AuthContext';
 import TiltedCard from '../components/TiltedCard';
+import { ModeToggle } from '../components/mode-toggle';
+import Squares from '../components/Squares';
+import { useTheme } from '../components/use-theme';
 
 interface Feature {
   id: string;
@@ -164,31 +167,44 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
   const role = profile?.role ?? null;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   const visibleFeatures = features.filter(
     (f) => role && f.roles.includes(role),
   );
 
   return (
-    <div style={{ paddingTop: '5rem', minHeight: '100vh', background: '#050508' }}>
+    <div style={{ paddingTop: '5rem', minHeight: '100vh', background: 'hsl(var(--background))', position: 'relative', overflow: 'hidden' }}>
+      {/* Background */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <Squares
+          direction="diagonal"
+          speed={0.5}
+          borderColor={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}
+          squareSize={40}
+          hoverFillColor={isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}
+          vignetteColor={isDark ? '#060010' : '#ffffff'}
+        />
+      </div>
       {/* Header */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 2rem 1rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.7rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-              {role ? ROLE_LABELS[role] : 'Dashboard'}
-            </p>
-            <h1 style={{ color: '#fff', fontSize: '2.2rem', fontWeight: 700, margin: 0 }}>
-              Trinetra Feature Modules
-            </h1>
-            <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '0.4rem', fontSize: '0.9rem' }}>
-              {visibleFeatures.length} active modules — select one to manage
-            </p>
-          </div>
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', padding: '3rem 2rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <p style={{ color: 'hsl(var(--muted-foreground))', fontSize: '0.7rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+            {role ? ROLE_LABELS[role] : 'Dashboard'}
+          </p>
+          <h1 style={{ color: 'hsl(var(--foreground))', fontSize: '2.2rem', fontWeight: 700, margin: 0 }}>
+            Trinetra Feature Modules
+          </h1>
+          <p style={{ color: 'hsl(var(--muted-foreground))', marginTop: '0.4rem', fontSize: '0.9rem' }}>
+            {visibleFeatures.length} active modules — select one to manage
+          </p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <ModeToggle />
           <button
             onClick={async () => { await logout(); navigate('/login'); }}
             style={{
-              marginTop: '0.3rem',
               padding: '0.5rem 1.2rem',
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.12)',
@@ -204,11 +220,15 @@ export default function Dashboard() {
             Logout
           </button>
         </div>
+      </div>
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
         <div style={{ marginTop: '1.5rem', height: '1px', background: 'linear-gradient(to right, rgba(255,255,255,0.08), transparent)' }} />
       </div>
 
       {/* Cards grid */}
       <div style={{
+        position: 'relative',
+        zIndex: 1,
         maxWidth: '1200px',
         margin: '0 auto',
         display: 'grid',

@@ -20,6 +20,7 @@ import Analytics from './pages/Analytics';
 
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
+import { ThemeProvider } from "@/components/theme-provider"
 
 const navItems = [
   { label: 'Home', href: 'http://localhost:3000/' },
@@ -30,22 +31,24 @@ const navItems = [
 function App() {
   return (
     <BrowserRouter>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <AuthProvider>
-        <div style={{ minHeight: '100vh', background: '#050508' }}>
+        <div style={{ minHeight: '100vh', background: 'hsl(var(--background))' }}>
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
-            <a href="http://localhost:3000" style={{ color: '#fff', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>TRINETRA</a>
+            <a href="http://localhost:3000" style={{ color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-            <GooeyNav
-              items={navItems}
-              particleCount={15}
-              particleDistances={[90, 10]}
-              particleR={100}
-              initialActiveIndex={1}
-              animationTime={600}
-              timeVariance={300}
-              colors={[1, 2, 3, 1, 2, 3, 1, 4]}
-            />
+              <GooeyNav
+                items={navItems}
+                particleCount={15}
+                particleDistances={[90, 10]}
+                particleR={100}
+                initialActiveIndex={1}
+                animationTime={600}
+                timeVariance={300}
+                colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+              />
             </div>
+            <div style={{ width: '100px' }} />
           </div>
           <Routes>
             {/* Public routes */}
@@ -78,6 +81,7 @@ function App() {
           <Footer2 />
         </div>
       </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
