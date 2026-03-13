@@ -37,7 +37,7 @@ const Footer2 = ({
     url: "/",
   },
   className,
-  tagline = "Components made easy.",
+  tagline = "See beyond the visible.",
   menuItems = [
     {
       title: "Product",
@@ -76,7 +76,7 @@ const Footer2 = ({
       ],
     },
   ],
-  copyright = "© 2024 Trinetra. All rights reserved.",
+  copyright = "© 2026 Trinetra. All rights reserved.",
   bottomLinks = [
     { text: "Terms and Conditions", url: "#" },
     { text: "Privacy Policy", url: "#" },

@@ -35,7 +35,7 @@ const Footer2 = ({
     url: "https://www.shadcnblocks.com",
   },
   className,
-  tagline = "Components made easy.",
+  tagline = "See beyond the visible.",
   menuItems = [
     {
       title: "Product",
@@ -76,7 +76,7 @@ const Footer2 = ({
       ],
     },
   ],
-  copyright = "© 2024 Shadcnblocks.com. All rights reserved.",
+  copyright = "© 2026 Shadcnblocks.com. All rights reserved.",
   bottomLinks = [
     { text: "Terms and Conditions", url: "#" },
     { text: "Privacy Policy", url: "#" },

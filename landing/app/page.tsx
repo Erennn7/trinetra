@@ -14,6 +14,24 @@ const navItems = [
 export default function Home() {
   return (
     <main style={{ background: '#050505', minHeight: '100vh' }}>
+      <style>{`
+        .signin-btn {
+          color: #fff;
+          text-decoration: none;
+          font-size: 0.85rem;
+          font-weight: 500;
+          padding: 0.5rem 0.75rem;
+          border-radius: 0.375rem;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          transition: all 0.3s ease;
+          cursor: pointer;
+          display: inline-block;
+        }
+        .signin-btn:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.4);
+        }
+      `}</style>
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
         <a href="#" style={{ color: '#fff', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
@@ -28,7 +46,14 @@ export default function Home() {
             colors={[1, 2, 3, 1, 2, 3, 1, 4]}
           />
         </div>
-        <div style={{ width: '100px' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100px', justifyContent: 'flex-end' }}>
+          <a 
+            href="http://localhost:5173/#/login"
+            className="signin-btn"
+          >
+            Sign In
+          </a>
+        </div>
       </div>
       <HeroCanvas />
       <VisionSection />

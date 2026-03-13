@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 const capabilities = [
   {
     number: '01',
-    title: 'Neural Vision',
+    title: 'Weapon Detection',
     description:
-      'Deep neural architectures trained on billions of visual signals. Trinetra sees what human eyes cannot — patterns, anomalies, intent.',
+      'AI-powered detection of firearms, sharp objects, and dangerous items in real-time. Advanced pattern recognition identifies potential threats instantly.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -17,9 +17,9 @@ const capabilities = [
   },
   {
     number: '02',
-    title: 'Zero Latency',
+    title: 'Crowd Analytics',
     description:
-      'Sub-millisecond inference at the edge. Our silicon-native pipeline delivers real-time perception without compromise.',
+      'Real-time crowd monitoring, density estimation, and anomaly detection. Track movements, identify unusual behaviors, and manage public spaces intelligently.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -28,9 +28,9 @@ const capabilities = [
   },
   {
     number: '03',
-    title: 'Adaptive Optics',
+    title: 'Multi-Modal Fusion',
     description:
-      'Dynamic sensor fusion across visible light, infrared, and beyond. Trinetra adapts to any environment, any condition.',
+      'Integrate visible light, thermal imaging, and depth sensors. Unified platform processes all sensor data seamlessly for comprehensive situational awareness.',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <circle cx="12" cy="12" r="3" />

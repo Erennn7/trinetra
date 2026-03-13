@@ -82,7 +82,7 @@ export default function VisionSection() {
             marginBottom: '48px',
           }}
         >
-          Trinetra is the all-seeing intelligence layer for{' '}
+          Trinetra enables intelligent surveillance with real-time threat detection, weapon recognition, and crowd analytics for{' '}
           <span
             style={{
               background: 'linear-gradient(135deg, #0050FF, #00D6FF)',
@@ -91,7 +91,7 @@ export default function VisionSection() {
               backgroundClip: 'text',
             }}
           >
-            next-generation perception.
+            smarter security.
           </span>
         </motion.h2>
 

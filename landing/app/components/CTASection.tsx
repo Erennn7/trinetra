@@ -56,7 +56,7 @@ export default function CTASection() {
               fontFamily: 'var(--font-inter)',
             }}
           >
-            The Third Eye Awaits
+            Smart Surveillance Awaits
           </span>
         </motion.div>
 
@@ -85,7 +85,7 @@ export default function CTASection() {
               backgroundClip: 'text',
             }}
           >
-            see
+            secure
           </span>{' '}
           everything?
         </motion.h2>

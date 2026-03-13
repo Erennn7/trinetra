@@ -16,9 +16,9 @@ interface Beat {
 }
 
 const BEATS: Beat[] = [
-  { headline: 'TRINETRA', subHeadline: 'See beyond the visible.', startPct: 0, endPct: 30 },
-  { headline: 'Perception\nReimagined', startPct: 30, endPct: 70 },
-  { headline: 'The future of vision.', cta: true, startPct: 70, endPct: 100 },
+  { headline: 'TRINETRA', subHeadline: 'Advanced Surveillance Intelligence', startPct: 0, endPct: 30 },
+  { headline: 'Security\nReimagined', startPct: 30, endPct: 70 },
+  { headline: 'The future of safety.', cta: true, startPct: 70, endPct: 100 },
 ];
 
 export default function HeroCanvas() {
