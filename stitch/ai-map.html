@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trinetra v3 | Surveillance Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#c084fc","background-light": "#1a0b2e",
+                "background-dark": "#0d041a",
+                "panel-glass": "rgba(45, 20, 85, 0.85)",},
+              fontFamily: {
+                "display": ["Public Sans", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.4rem", "lg": "0.6rem", "xl": "1rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #0d041a;
+        }
+        .glass-panel {
+            background: rgba(35, 15, 75, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(192, 132, 252, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(192, 132, 252, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #0d041a 0%, #1a0b2e 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 overflow-hidden font-display">
+<div class="relative flex h-screen w-full overflow-hidden">
+<aside class="relative z-30 flex h-full w-72 flex-col border-r border-primary/20 sidebar-gradient p-6 shadow-2xl">
+<div class="mb-10 flex items-center gap-3">
+<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary ring-1 ring-primary/40">
+<span class="material-symbols-outlined text-2xl">visibility</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold tracking-tight text-white">Trinetra v3</h1>
+<p class="text-xs font-medium text-primary/70 uppercase tracking-widest">Surveillance</p>
+</div>
+</div>
+<nav class="flex flex-1 flex-col gap-2">
+<a class="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 transition-all hover:bg-primary/20 hover:text-white" href="#">
+<span class="material-symbols-outlined text-xl">fingerprint</span>
+<span class="text-sm font-medium">Biometric Analysis</span>
+</a>
+<a class="flex items-center gap-3 rounded-xl bg-primary/30 px-4 py-3 text-white ring-1 ring-primary/50" href="#">
+<span class="material-symbols-outlined text-xl">groups</span>
+<span class="text-sm font-medium">Crowd Density</span>
+</a>
+<a class="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 transition-all hover:bg-primary/20 hover:text-white" href="#">
+<span class="material-symbols-outlined text-xl">shield</span>
+<span class="text-sm font-medium">Weapon Detection</span>
+</a>
+<a class="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 transition-all hover:bg-primary/20 hover:text-white" href="#">
+<span class="material-symbols-outlined text-xl">search_check</span>
+<span class="text-sm font-medium">Lost &amp; Found</span>
+</a>
+<div class="my-4 h-px bg-primary/20"></div>
+<p class="px-4 text-[10px] font-bold uppercase tracking-widest text-primary/50">System</p>
+<a class="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 transition-all hover:bg-primary/20 hover:text-white" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-medium">Configuration</span>
+</a>
+</nav>
+<div class="mt-auto flex items-center gap-3 rounded-2xl bg-primary/10 p-3 ring-1 ring-primary/20">
+<div class="h-10 w-10 overflow-hidden rounded-full border border-primary/40">
+<img alt="Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX5xFCeGklnyFP5AZtNm3Q42VHZGETrbO3T6t2J51SZZ_5BK0jFZXDlA-jM0gfRpf2nGmjl8B9Sqk2zBfbnwSy91axGp5PvA9Y5Lqnr8u4Y2_6oGvjOOQ-MBNfE0HntDwmkJuMcA4DnHeNwA5LA70kH1hYNE7xoWGzt7FICembPSnh73kn8nHSulLEZjvDV1zuGQzXlfZX1wWdzegbwDHLRWPU0GIGxDnIISz37wcLKCnu3KfV7h_oY9YmHWVHHQ5Nl7C7PA9kDFQ"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-white leading-none">Officer K. Jha</span>
+<span class="text-[10px] text-primary/70 mt-1">L4 Clearanced</span>
+</div>
+</div>
+</aside>
+<main class="relative flex-1 bg-background-dark">
+<div class="absolute inset-0 grid-bg opacity-40 pointer-events-none"></div>
+<div class="absolute inset-0 z-0 bg-cover bg-center grayscale brightness-50 contrast-125" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCSm8lpNgwo9tWJBYH2O82e5eCVn4Xwf1GUGCaBro3lQ5vjmNtnRqRRxD7wKrJNW87xdKLnl3EiPLf0cjPVTBvXM7ZrEbIWBWql3HwgtGvDyGUWpO8MfB7bPhVahAt7ks3wwPqE4ZR2k9PqAccBuu9awIAu0d9RR2m5qtgRl3o12ynjwWOjAu_gpwYJZbdFvqSRfY7BXYJJT1Vg-xJucq2TbBY1DKv5hlB5HkWoglAgMYpL1h1kaLCejDgWhiMky-JbzGBDyCm6WbE');">
+</div>
+<div class="relative z-10 flex h-full flex-col p-6">
+<div class="flex flex-col items-center gap-4 w-full">
+<div class="glass-panel flex w-full max-w-2xl items-center gap-3 rounded-2xl px-5 py-3 shadow-2xl">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<input class="flex-1 border-none bg-transparent text-sm font-medium text-white placeholder-slate-400 focus:outline-none focus:ring-0" placeholder="AI Guided Search (Voice enabled)..." type="text"/>
+<div class="flex items-center gap-2 border-l border-primary/30 pl-3">
+<button class="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-primary/30 text-slate-300 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-xl">mic</span>
+</button>
+<button class="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-primary/30 text-slate-300 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-xl">search</span>
+</button>
+</div>
+</div>
+<div class="glass-panel flex items-center gap-1 rounded-xl p-1 shadow-xl">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/30 text-white ring-1 ring-primary/40">
+<span class="material-symbols-outlined text-sm">layers</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">VIEW MODES</span>
+</button>
+<div class="w-px h-6 bg-primary/20 mx-1"></div>
+<button class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:bg-primary/20 hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">terrain</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">3D TERRAIN</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:bg-primary/20 hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">thermostat</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">HEATMAPS</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:bg-primary/20 hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">traffic</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">TRAFFIC</span>
+</button>
+<div class="w-px h-6 bg-primary/20 mx-1"></div>
+<button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:bg-primary/20">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-300 hover:bg-primary/20">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+</div>
+</div>
+<div class="absolute top-6 right-6">
+<div class="glass-panel flex items-center gap-3 rounded-full pl-4 pr-3 py-2 shadow-xl ring-1 ring-primary/40">
+<div class="flex flex-col items-end">
+<span class="text-[9px] font-bold uppercase tracking-widest text-primary/80 leading-none mb-0.5">Zone Status</span>
+<span class="text-xs font-semibold text-white leading-none">Zone 04: Sector C</span>
+</div>
+<div class="h-6 w-px bg-primary/30"></div>
+<div class="flex items-center gap-2 bg-black/40 px-2 py-1 rounded-full">
+<div class="h-2 w-2 animate-pulse rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]"></div>
+<span class="text-[10px] font-bold text-white uppercase">Live</span>
+</div>
+</div>
+</div>
+<div class="mt-auto flex justify-end">
+<div class="glass-panel w-full max-w-md overflow-hidden rounded-2xl shadow-2xl ring-1 ring-primary/40">
+<div class="flex items-center justify-between border-b border-primary/20 bg-primary/20 px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary">bolt</span>
+<span class="text-xs font-bold uppercase tracking-widest text-white">Active Alert</span>
+</div>
+<span class="text-[10px] font-medium text-primary/70">2 mins ago</span>
+</div>
+<div class="flex gap-4 p-4">
+<div class="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg ring-1 ring-primary/30">
+<img alt="Surveillance feed" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYx2boKgKtapTiMgCqunqIf-2humeK9tKPbK9IlYnwtP_GEAEjaC0C2ha9LeR7m4ZCFEyFstzPzWGORTWVGaVe33lgj7TIMYnwWVVqCIBcI4u21luLkSgTpuTVcKjuJ2WEWt_GWel2Zs7DVypF_tUVgAo2kB12lcaxi_Oc8OjkC_OvP27HFBTS6omNjEvwY34MuUz8y8dGYIxpGeDbkMTkrZLYNaJlS9NfX5Pct1tZBX24_FHz68iOIPcaKphUKTsWJsXQDDWTkRY"/>
+<div class="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-white">play_circle</span>
+</div>
+</div>
+<div class="flex flex-1 flex-col justify-center">
+<h3 class="text-sm font-bold text-white leading-tight">AI Event Analysis</h3>
+<p class="mt-1 text-xs text-slate-300 leading-normal">Unusual crowd gathering detected at Zone 4 near the main terminal entrance.</p>
+<div class="mt-3 flex gap-2">
+<button class="flex-1 rounded-lg bg-primary py-1.5 text-[11px] font-bold text-background-dark shadow-lg transition-transform hover:scale-105 active:scale-95">
+                                    Analyze Event
+                                </button>
+<button class="rounded-lg bg-black/40 px-3 py-1.5 text-[11px] font-bold text-slate-300 ring-1 ring-primary/30 hover:bg-primary/30 transition-colors">
+                                    Dismiss
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute left-[45%] top-[55%] z-10">
+<div class="relative flex items-center justify-center">
+<div class="absolute h-12 w-12 animate-ping rounded-full bg-primary/30"></div>
+<div class="relative h-4 w-4 rounded-full border-2 border-white bg-primary shadow-[0_0_20px_rgba(192,132,252,1)]"></div>
+</div>
+</div>
+<div class="absolute left-[30%] top-[40%] z-10">
+<div class="h-3 w-3 rounded-full border-2 border-white bg-primary/40 shadow-lg"></div>
+</div>
+<div class="absolute left-[60%] top-[30%] z-10">
+<div class="h-3 w-3 rounded-full border-2 border-white bg-primary/40 shadow-lg"></div>
+</div>
+</main>
+</div>
+
+</body></html>

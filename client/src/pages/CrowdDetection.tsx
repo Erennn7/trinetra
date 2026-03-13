@@ -1,5 +1,12 @@
 import { useState, useRef, useCallback, type DragEvent, type ReactNode, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft, Upload, Image as ImageIcon, Video, Loader2,
+  AlertTriangle, Users, Activity, Maximize, BarChart3, ChevronRight
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const GLASS = "bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl";
 
 interface RegionStat {
   crowd_level: string;
@@ -109,133 +116,167 @@ export default function CrowdDetection() {
   }, [processFile]);
 
   return (
-    <div style={{ paddingTop: '5rem', minHeight: '100vh', background: '#050508' }}>
-      {/* Header */}
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '2rem 1.5rem 0' }}>
-        <button
-          onClick={() => navigate('/dashboard')}
-          style={{
-            background: 'none', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8,
-            color: 'rgba(255,255,255,0.5)', cursor: 'pointer', padding: '0.4rem 1rem',
-            fontSize: '0.8rem', marginBottom: '1.5rem',
-          }}
-        >
-          ← Back to Dashboard
-        </button>
-
-        <h1 style={{ color: '#fff', fontSize: '2rem', fontWeight: 700, margin: 0 }}>
-          Crowd Detection
-        </h1>
-        <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: '0.3rem', fontSize: '0.85rem' }}>
-          Upload drone footage or images to analyze crowd density
-        </p>
-        <div style={{ marginTop: '1.2rem', height: 1, background: 'linear-gradient(to right, rgba(255,255,255,0.08), transparent)' }} />
-      </div>
-
-      {/* Upload area */}
-      <div style={{ maxWidth: 960, margin: '2rem auto', padding: '0 1.5rem' }}>
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          onDragOver={(e: DragEvent<HTMLDivElement>) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={onDrop}
-          style={{
-            border: `2px dashed ${dragOver ? '#a78bfa' : 'rgba(255,255,255,0.12)'}`,
-            borderRadius: 16, padding: '3rem 2rem', textAlign: 'center',
-            cursor: 'pointer', transition: 'border-color 0.2s',
-            background: dragOver ? 'rgba(167,139,250,0.04)' : 'transparent',
-          }}
-        >
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>📁</div>
-          <p style={{ color: '#fff', fontWeight: 600, fontSize: '1rem', margin: 0 }}>
-            Drop files here or click to browse
-          </p>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem', marginTop: '0.4rem' }}>
-            Images (JPG, PNG, BMP, TIFF) &bull; Videos (MP4, AVI, MOV) &bull; Max 100 MB
-          </p>
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".jpg,.jpeg,.png,.bmp,.tiff,.mp4,.avi,.mov,.mkv,.wmv"
-          hidden
-          onChange={(e: ChangeEvent<HTMLInputElement>) => { if (e.target.files?.[0]) processFile(e.target.files[0]); }}
-        />
-      </div>
-
-      {/* Error */}
-      {error && (
-        <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 1.5rem' }}>
-          <div style={{
-            background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)',
-            borderRadius: 10, padding: '0.8rem 1.2rem', color: '#fca5a5', fontSize: '0.85rem',
-          }}>
-            {error}
+    <div className="pt-20 min-h-screen bg-background text-foreground pb-20">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        {/* ═══════════════════ HEADER BAR ═══════════════════ */}
+        <header className={cn('rounded-xl h-16 lg:h-20 flex flex-wrap gap-4 items-center justify-between px-5 lg:px-8 mb-6 relative overflow-hidden', GLASS)}>
+          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-transparent pointer-events-none" />
+          <div className="flex items-center gap-4 lg:gap-6 relative z-10">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-muted-foreground hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 transition-all"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="h-8 w-px bg-white/10 hidden sm:block" />
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded bg-violet-500/20 flex items-center justify-center">
+                  <Users className="h-4 w-4 text-violet-400" />
+                </div>
+                <h1 className="text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                  Crowd Density Analysis
+                </h1>
+              </div>
+              <p className="text-[11px] lg:text-xs text-muted-foreground mt-1 hidden sm:block">
+                Upload drone footage or images to analyze crowd distribution and density.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        </header>
 
-      {/* Preview */}
-      {preview && (
-        <div style={{ maxWidth: 960, margin: '1.5rem auto', padding: '0 1.5rem' }}>
-          <Card title="Preview">
-            {previewType === 'image' ? (
-              <img src={preview} alt="Preview" style={{ maxWidth: '100%', borderRadius: 8 }} />
-            ) : (
-              <video src={preview} controls style={{ maxWidth: '100%', borderRadius: 8 }} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+          
+          {/* ─── LEFT COLUMN: Upload & Preview ─── */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Upload Area */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e: DragEvent<HTMLDivElement>) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={onDrop}
+              className={cn(
+                'rounded-xl p-8 text-center cursor-pointer transition-all duration-300 relative overflow-hidden group',
+                GLASS,
+                dragOver ? 'border-violet-500 ring-4 ring-violet-500/20 bg-violet-500/5' : 'hover:border-violet-500/40 hover:bg-white/5'
+              )}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              
+              <div className="h-16 w-16 mx-auto rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Upload className="h-8 w-8 text-violet-400" />
+              </div>
+              
+              <h3 className="text-base font-bold text-foreground mb-2">
+                Upload Footage
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                Drag & drop or click to browse
+              </p>
+              
+              <div className="flex items-center justify-center gap-3 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                <span className="flex items-center gap-1"><ImageIcon className="h-3 w-3" /> JPG/PNG</span>
+                <span>&bull;</span>
+                <span className="flex items-center gap-1"><Video className="h-3 w-3" /> MP4/AVI</span>
+              </div>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.bmp,.tiff,.mp4,.avi,.mov,.mkv,.wmv"
+                hidden
+                onChange={(e: ChangeEvent<HTMLInputElement>) => { if (e.target.files?.[0]) processFile(e.target.files[0]); }}
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex items-start gap-3 text-destructive animate-in fade-in slide-in-from-top-2">
+                <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
+                <div className="text-sm font-medium">{error}</div>
+              </div>
             )}
-          </Card>
-        </div>
-      )}
 
-      {/* Loading */}
-      {loading && (
-        <div style={{ maxWidth: 960, margin: '1.5rem auto', padding: '0 1.5rem', textAlign: 'center' }}>
-          <div style={{
-            background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)',
-            borderRadius: 12, padding: '2rem', color: '#c4b5fd',
-          }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', animation: 'spin 1.2s linear infinite' }}>⏳</div>
-            <p style={{ margin: 0, fontWeight: 500 }}>Analyzing… this may take a moment for videos</p>
+            {/* Loading State */}
+            {loading && (
+              <div className={cn('rounded-xl p-8 text-center', GLASS)}>
+                <Loader2 className="h-10 w-10 text-violet-400 animate-spin mx-auto mb-4" />
+                <h3 className="text-sm font-bold text-white mb-1">Analyzing Media...</h3>
+                <p className="text-xs text-muted-foreground">Deep learning models are processing the input.</p>
+              </div>
+            )}
+
+            {/* Preview Area */}
+            {preview && !loading && !result && (
+              <div className={cn('rounded-xl overflow-hidden', GLASS)}>
+                <div className="p-3 border-b border-white/10 bg-white/5 flex items-center gap-2">
+                  <Maximize className="h-4 w-4 text-violet-400" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Input Preview</span>
+                </div>
+                <div className="bg-black/50 aspect-video relative flex items-center justify-center">
+                  {previewType === 'image' ? (
+                    <img src={preview} alt="Preview" className="max-w-full max-h-full object-contain" />
+                  ) : (
+                    <video src={preview} controls className="max-w-full max-h-full" />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      )}
 
-      {/* Results */}
-      {result && !loading && (
-        <div style={{ maxWidth: 960, margin: '1.5rem auto', padding: '0 1.5rem 4rem' }}>
-          {result.type === 'image' ? <ImageResults data={result} /> : <VideoResults data={result} />}
+          {/* ─── RIGHT COLUMN: Results ─── */}
+          <div className="lg:col-span-8 space-y-6">
+            {!result && !loading && (
+              <div className={cn('rounded-xl h-full min-h-[400px] flex flex-col items-center justify-center text-center p-8 border-dashed', GLASS)}>
+                <Activity className="h-12 w-12 text-white/10 mb-4" />
+                <h3 className="text-lg font-bold text-white/40 mb-2">Awaiting Input</h3>
+                <p className="text-sm text-white/20 max-w-sm">
+                  Upload an image or video to see the AI crowd density analysis and heatmap generation here.
+                </p>
+              </div>
+            )}
+            {result && !loading && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+                {result.type === 'image' ? <ImageResults data={result} /> : <VideoResults data={result} />}
+              </div>
+            )}
+          </div>
+
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
 /* ───── Sub-components ───── */
 
-function Card({ title, children }: { title: string; children: ReactNode }) {
+function Card({ title, children, icon: Icon }: { title: string; children: ReactNode; icon?: any }) {
   return (
-    <div style={{
-      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
-      borderRadius: 14, padding: '1.2rem 1.4rem', marginBottom: '1.2rem',
-    }}>
-      <h3 style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 1rem' }}>
-        {title}
-      </h3>
-      {children}
+    <div className={cn('rounded-xl overflow-hidden', GLASS)}>
+      <div className="p-4 border-b border-white/10 bg-white/5 flex items-center gap-2">
+        {Icon && <Icon className="h-4 w-4 text-violet-400" />}
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          {title}
+        </h3>
+      </div>
+      <div className="p-5">
+        {children}
+      </div>
     </div>
   );
 }
 
 function StatBox({ label, value, color }: { label: string; value: string | number; color?: string }) {
   return (
-    <div style={{
-      background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '1rem 1.2rem',
-      flex: '1 1 140px', minWidth: 140,
-    }}>
-      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: color ?? '#fff' }}>{value}</div>
-      <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: '0.2rem' }}>{label}</div>
+    <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex-1 min-w-[140px] hover:bg-white/10 transition-colors">
+      <div className="text-2xl font-bold tracking-tight mb-1" style={{ color: color ?? '#fff' }}>
+        {value}
+      </div>
+      <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+        {label}
+      </div>
     </div>
   );
 }
@@ -244,8 +285,8 @@ function ImageResults({ data }: { data: ImageResult }) {
   const a = data.analysis;
   return (
     <>
-      <Card title="Analysis Summary">
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+      <Card title="Analysis Summary" icon={Activity}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatBox label="Estimated People" value={a.estimated_count.toLocaleString()} />
           <StatBox label="Crowd Level" value={a.crowd_level} color={levelColor(a.crowd_level)} />
           <StatBox label="Confidence" value={`${(a.confidence * 100).toFixed(1)}%`} />
@@ -253,22 +294,20 @@ function ImageResults({ data }: { data: ImageResult }) {
         </div>
       </Card>
 
-      <Card title="Road Side Analysis">
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+      <Card title="Regional Distribution" icon={BarChart3}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {(['left_side', 'center', 'right_side'] as const).map((k) => {
             const r = a.regions[k];
             if (!r) return null;
             return (
-              <div key={k} style={{
-                flex: '1 1 180px', background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '1rem',
-              }}>
-                <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem', marginBottom: '0.3rem' }}>
-                  {k.replace(/_/g, ' ').toUpperCase()}
+              <div key={k} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">
+                  {k.replace(/_/g, ' ')}
                 </div>
-                <div style={{ color: levelColor(r.crowd_level), fontWeight: 500, fontSize: '0.85rem' }}>
+                <div className="text-lg font-bold mb-1" style={{ color: levelColor(r.crowd_level) }}>
                   {r.crowd_level}
                 </div>
-                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem', marginTop: '0.2rem' }}>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
                   Density: {r.mean_density.toFixed(4)}
                 </div>
               </div>
@@ -277,27 +316,39 @@ function ImageResults({ data }: { data: ImageResult }) {
         </div>
       </Card>
 
-      <Card title="Heatmap Visualizations">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+      <Card title="Heatmap Visualizations" icon={ImageIcon}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.images.heatmap && (
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginBottom: '0.4rem' }}>Heatmap</p>
-              <img src={`data:image/png;base64,${data.images.heatmap}`} alt="Heatmap" style={{ width: '100%', borderRadius: 8 }} />
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
+                <ChevronRight className="h-3 w-3 text-violet-400" /> Heatmap
+              </p>
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
+                <img src={`data:image/png;base64,${data.images.heatmap}`} alt="Heatmap" className="w-full h-auto object-contain" />
+              </div>
             </div>
           )}
           {data.images.blended && (
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginBottom: '0.4rem' }}>Blended View</p>
-              <img src={`data:image/jpeg;base64,${data.images.blended}`} alt="Blended" style={{ width: '100%', borderRadius: 8 }} />
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
+                <ChevronRight className="h-3 w-3 text-violet-400" /> Blended View
+              </p>
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
+                <img src={`data:image/jpeg;base64,${data.images.blended}`} alt="Blended" className="w-full h-auto object-contain" />
+              </div>
+            </div>
+          )}
+          {data.images.analysis && (
+            <div className="space-y-2 md:col-span-2">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
+                <ChevronRight className="h-3 w-3 text-violet-400" /> Detailed Analysis
+              </p>
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
+                <img src={`data:image/png;base64,${data.images.analysis}`} alt="Analysis" className="w-full h-auto object-contain" />
+              </div>
             </div>
           )}
         </div>
-        {data.images.analysis && (
-          <div style={{ marginTop: '1rem' }}>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginBottom: '0.4rem' }}>Detailed Analysis</p>
-            <img src={`data:image/png;base64,${data.images.analysis}`} alt="Analysis" style={{ width: '100%', borderRadius: 8 }} />
-          </div>
-        )}
       </Card>
     </>
   );
@@ -307,29 +358,29 @@ function VideoResults({ data }: { data: VideoResult }) {
   const a = data.analysis;
   return (
     <>
-      <Card title="Video Analysis Summary">
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+      <Card title="Video Analysis Summary" icon={Activity}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatBox label="Total Frames" value={a.total_frames.toLocaleString()} />
-          <StatBox label="Avg People / Frame" value={a.average_people_per_frame.toFixed(1)} />
+          <StatBox label="Avg / Frame" value={a.average_people_per_frame.toFixed(1)} />
           <StatBox label="Peak Count" value={a.max_people_in_frame.toLocaleString()} />
           <StatBox label="Crowd Level" value={a.final_crowd_level} color={levelColor(a.final_crowd_level)} />
         </div>
       </Card>
 
-      <Card title="Road Side Distribution">
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+      <Card title="Regional Distribution" icon={BarChart3}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {(['left_side', 'center', 'right_side'] as const).map((k) => {
             const r = a.final_regions[k];
             if (!r) return null;
             return (
-              <div key={k} style={{
-                flex: '1 1 180px', background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '1rem',
-              }}>
-                <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem', marginBottom: '0.3rem' }}>
-                  {k.replace(/_/g, ' ').toUpperCase()}
+              <div key={k} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">
+                  {k.replace(/_/g, ' ')}
                 </div>
-                <div style={{ color: levelColor(r.crowd_level), fontWeight: 500 }}>{r.crowd_level}</div>
-                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem', marginTop: '0.2rem' }}>
+                <div className="text-lg font-bold mb-1" style={{ color: levelColor(r.crowd_level) }}>
+                  {r.crowd_level}
+                </div>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
                   Density: {r.mean_density.toFixed(4)}
                 </div>
               </div>
@@ -338,35 +389,51 @@ function VideoResults({ data }: { data: VideoResult }) {
         </div>
       </Card>
 
-      <Card title="Generated Videos">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-          <div>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginBottom: '0.4rem' }}>Blended Video</p>
-            <video key={data.videos.blended_video} controls style={{ width: '100%', borderRadius: 8 }}>
-              <source src={data.videos.blended_video} type="video/mp4" />
-            </video>
+      <Card title="Generated Videos" icon={Video}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
+              <ChevronRight className="h-3 w-3 text-violet-400" /> Blended Video
+            </p>
+            <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
+              <video key={data.videos.blended_video} controls className="w-full h-auto">
+                <source src={data.videos.blended_video} type="video/mp4" />
+              </video>
+            </div>
           </div>
-          <div>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginBottom: '0.4rem' }}>Heatmap Video</p>
-            <video key={data.videos.heatmap_video} controls style={{ width: '100%', borderRadius: 8 }}>
-              <source src={data.videos.heatmap_video} type="video/mp4" />
-            </video>
+          <div className="space-y-2">
+            <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
+              <ChevronRight className="h-3 w-3 text-violet-400" /> Heatmap Video
+            </p>
+            <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
+              <video key={data.videos.heatmap_video} controls className="w-full h-auto">
+                <source src={data.videos.heatmap_video} type="video/mp4" />
+              </video>
+            </div>
           </div>
         </div>
       </Card>
 
-      <Card title="Final Cumulative Heatmaps">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+      <Card title="Final Cumulative Heatmaps" icon={ImageIcon}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.images.final_heatmap && (
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginBottom: '0.4rem' }}>Final Heatmap</p>
-              <img src={`data:image/png;base64,${data.images.final_heatmap}`} alt="Final Heatmap" style={{ width: '100%', borderRadius: 8 }} />
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
+                <ChevronRight className="h-3 w-3 text-violet-400" /> Final Heatmap
+              </p>
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
+                <img src={`data:image/png;base64,${data.images.final_heatmap}`} alt="Final Heatmap" className="w-full h-auto object-contain" />
+              </div>
             </div>
           )}
           {data.images.final_analysis && (
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginBottom: '0.4rem' }}>Final Analysis</p>
-              <img src={`data:image/png;base64,${data.images.final_analysis}`} alt="Final Analysis" style={{ width: '100%', borderRadius: 8 }} />
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-2">
+                <ChevronRight className="h-3 w-3 text-violet-400" /> Final Analysis
+              </p>
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-black">
+                <img src={`data:image/png;base64,${data.images.final_analysis}`} alt="Final Analysis" className="w-full h-auto object-contain" />
+              </div>
             </div>
           )}
         </div>
