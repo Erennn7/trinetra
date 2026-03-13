@@ -51,11 +51,11 @@ export function useDisasterData() {
   return ctx;
 }
 
-const API_BASE_URL = import.meta.env.VITE_DISASTER_API_URL || 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_DISASTER_API_URL || 'http://10.44.19.195:5001';
 
 export function DisasterDataProvider({ children }: { children: ReactNode }) {
   const { profile } = useAuth();
-  const [selectedCity, setSelectedCity] = useState('prayagraj');
+  const [selectedCity, setSelectedCity] = useState('pandharpur');
   const [availableCities, setAvailableCities] = useState<CityConfig[]>([
     { id: 'prayagraj', name: 'Prayagraj', display_name: 'Prayagraj (Mahakumbh)', is_primary: true, lat: 25.4358, lon: 81.8463, zoom: 13 },
     { id: 'pandharpur', name: 'Pandharpur', display_name: 'Pandharpur (Wari)', is_primary: false, lat: 17.6784, lon: 75.3294, zoom: 15 },
