@@ -37,6 +37,17 @@ body {
   overflow-x: hidden;
 }
 
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+.goog-logo-link,
+.goog-te-gadget {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;

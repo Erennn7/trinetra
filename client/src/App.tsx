@@ -25,6 +25,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { ModeToggle } from './components/mode-toggle';
 import { Avatar, AvatarFallback } from './components/ui/avatar';
 import { useAuth } from './context/AuthContext';
+import ChatbotPopup from './components/ChatbotPopup';
+import LanguageSwitcher from './components/LanguageSwitcher';
+import VoiceNavigator from './components/VoiceNavigator';
 
 const navItems = [
   { label: 'Home', href: 'http://localhost:3000/' },
@@ -37,7 +40,7 @@ function NavBar() {
   const navigate = useNavigate();
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
-      <a href="http://localhost:3000" style={{ color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
+      <a href="http://localhost:3000" className="notranslate" style={{ color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
       <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
         <GooeyNav
           items={navItems}
@@ -50,7 +53,8 @@ function NavBar() {
           colors={[1, 2, 3, 1, 2, 3, 1, 4]}
         />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', width: '100px', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', width: '260px', justifyContent: 'flex-end' }}>
+        <LanguageSwitcher />
         <ModeToggle />
         {profile && (
           <Avatar style={{ cursor: 'pointer' }} onClick={async () => { await logout(); navigate('/login'); }}>
@@ -105,6 +109,8 @@ function App() {
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
           <Footer2 />
+          <ChatbotPopup/>
+          <VoiceNavigator />
         </div>
       </AuthProvider>
       </ThemeProvider>

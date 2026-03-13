@@ -4,6 +4,8 @@ import VisionSection from './components/VisionSection';
 import TechnologySection from './components/TechnologySection';
 import CTASection from './components/CTASection';
 import { Footer2 } from './components/Footer2';
+import LanguageSwitcher from './components/LanguageSwitcher';
+import VoiceNavigator from './components/VoiceNavigator';
 
 const navItems = [
   { label: 'Home', href: 'http://localhost:3000/' },
@@ -33,7 +35,7 @@ export default function Home() {
         }
       `}</style>
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
-        <a href="#" style={{ color: '#fff', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
+        <a href="#" className="notranslate" style={{ color: '#fff', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
           <GooeyNav
             items={navItems}
@@ -46,7 +48,8 @@ export default function Home() {
             colors={[1, 2, 3, 1, 2, 3, 1, 4]}
           />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100px', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '260px', justifyContent: 'flex-end' }}>
+          <LanguageSwitcher />
           <a 
             href="http://localhost:5173/#/login"
             className="signin-btn"
@@ -60,6 +63,7 @@ export default function Home() {
       <TechnologySection />
       <CTASection />
       <Footer2 />
+      <VoiceNavigator />
     </main>
   );
 }
