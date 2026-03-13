@@ -1,0 +1,633 @@
+/* AI Guided Map Styles - scoped under .aimap-root */
+
+.aimap-root {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.aimap-root.split-view {
+  flex-direction: row;
+}
+
+/* Back button */
+.aimap-back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #1a1a1a;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.aimap-back-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Language Selector */
+.aimap-lang-selector {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+}
+
+.aimap-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #1a1a1a;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.aimap-lang-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.aimap-lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  min-width: 180px;
+  animation: aimap-fadeIn 0.2s ease;
+}
+
+@keyframes aimap-fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.aimap-lang-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #333;
+  transition: background 0.15s ease;
+}
+
+.aimap-lang-option:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.aimap-lang-option.active {
+  background: rgba(102, 126, 234, 0.15);
+  font-weight: 600;
+}
+
+.aimap-lang-native {
+  font-weight: 500;
+}
+
+.aimap-lang-english {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* Search Bar */
+.aimap-search-container {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px 20px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 400px;
+  transition: all 0.3s ease;
+}
+
+.aimap-search-container:hover {
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.aimap-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #1a1a1a;
+  outline: none;
+  padding: 8px 0;
+}
+
+.aimap-search-input::placeholder {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.aimap-search-button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aimap-search-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.aimap-search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Voice Input Button */
+.aimap-voice-input-button {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.aimap-voice-input-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.aimap-voice-input-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Status indicators */
+.aimap-offline-indicator,
+.aimap-voice-indicator,
+.aimap-voice-input-indicator {
+  position: absolute;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: aimap-slideIn 0.5s ease-out;
+}
+
+.aimap-offline-indicator {
+  top: 70px;
+  left: 20px;
+  background: rgba(239, 68, 68, 0.95);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.aimap-voice-indicator {
+  top: 70px;
+  right: 20px;
+  background: rgba(59, 130, 246, 0.95);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.aimap-voice-input-indicator {
+  top: 80px;
+  left: 20px;
+  background: rgba(16, 185, 129, 0.95);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+/* Map Loading Overlay */
+.aimap-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(102, 126, 234, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.aimap-loading-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 300px;
+}
+
+.aimap-loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(102, 126, 234, 0.2);
+  border-radius: 50%;
+  border-top-color: #667eea;
+  animation: aimap-spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.aimap-loading-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.aimap-loading-progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(102, 126, 234, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.aimap-loading-progress-bar {
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.aimap-loading-percentage {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.aimap-cache-indicator {
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* AI Suggestion - floating (full view) */
+.aimap-ai-suggestion {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 20px 24px;
+  border-radius: 16px;
+  max-width: 500px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: aimap-fadeIn 0.6s ease-out;
+}
+
+/* AI Suggestion - side panel (split view) */
+.aimap-ai-panel {
+  width: 30vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  animation: aimap-slideIn 0.5s ease-out;
+}
+
+.aimap-ai-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-weight: 700;
+  color: #667eea;
+  font-size: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.aimap-traffic-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.aimap-traffic-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.aimap-traffic-dot.moderate {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+.aimap-traffic-dot.heavy {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.aimap-traffic-text {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.aimap-ai-content {
+  color: #374151;
+  line-height: 1.6;
+  font-weight: 500;
+  margin: 0;
+}
+
+.aimap-ai-content h2 {
+  color: #667eea;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 16px 0 8px 0;
+  padding-bottom: 4px;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.aimap-ai-content h2:first-child {
+  margin-top: 0;
+}
+
+.aimap-ai-content p {
+  margin: 8px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.aimap-ai-content strong {
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.aimap-ai-content ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.aimap-ai-content li {
+  margin: 4px 0;
+  font-size: 0.95rem;
+}
+
+.aimap-ai-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(102, 126, 234, 0.1);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.aimap-voice-action-button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.aimap-voice-action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.aimap-voice-action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Control Panel */
+.aimap-control-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aimap-control-button {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #1a1a1a;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aimap-control-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 1);
+}
+
+.aimap-control-button.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.aimap-control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Cache & Offline status badges */
+.aimap-cache-status,
+.aimap-offline-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.aimap-cache-status {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.aimap-offline-status {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Loading spinner */
+.aimap-loading-spinner-sm {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: aimap-spin 1s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes aimap-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes aimap-fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes aimap-slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .aimap-search-container {
+    min-width: 320px;
+    padding: 12px 16px;
+    top: 10px;
+  }
+
+  .aimap-ai-suggestion {
+    max-width: 90%;
+    top: 80px;
+    padding: 16px 20px;
+  }
+
+  .aimap-ai-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .aimap-traffic-indicator {
+    margin-left: 0;
+  }
+
+  .aimap-control-panel {
+    top: 10px;
+    right: 10px;
+  }
+
+  .aimap-control-button {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+
+  .aimap-root.split-view {
+    flex-direction: column;
+  }
+
+  .aimap-ai-panel {
+    width: 100vw;
+    height: 50vh;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .aimap-search-container {
+    min-width: 280px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .aimap-ai-suggestion {
+    max-width: 95%;
+    padding: 12px 16px;
+  }
+
+  .aimap-ai-panel {
+    height: 60vh;
+  }
+}
