@@ -14,6 +14,7 @@ export interface GooeyNavProps {
   timeVariance?: number;
   colors?: number[];
   initialActiveIndex?: number;
+  onNavigate?: (href: string) => void;
 }
 
 const GooeyNav: React.FC<GooeyNavProps> = ({
@@ -24,7 +25,8 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
   particleR = 100,
   timeVariance = 300,
   colors = [1, 2, 3, 1, 2, 3, 1, 4],
-  initialActiveIndex = 0
+  initialActiveIndex = 0,
+  onNavigate,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLUListElement>(null);
@@ -103,30 +105,32 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
     e.preventDefault();
     const liEl = (e.currentTarget as HTMLElement).closest('li') as HTMLElement;
     const href = items[index].href;
-    if (activeIndex === index) return;
+    const isSameIndex = activeIndex === index;
     setActiveIndex(index);
     updateEffectPosition(liEl);
-    if (filterRef.current) {
-      const particles = filterRef.current.querySelectorAll('.particle');
-      particles.forEach(p => filterRef.current!.removeChild(p));
-    }
-    if (textRef.current) {
-      textRef.current.classList.remove('active');
-      void textRef.current.offsetWidth;
-      textRef.current.classList.add('active');
-    }
-    if (filterRef.current) {
-      makeParticles(filterRef.current);
+    if (!isSameIndex) {
+      if (filterRef.current) {
+        const particles = filterRef.current.querySelectorAll('.particle');
+        particles.forEach(p => filterRef.current!.removeChild(p));
+      }
+      if (textRef.current) {
+        textRef.current.classList.remove('active');
+        void textRef.current.offsetWidth;
+        textRef.current.classList.add('active');
+      }
+      if (filterRef.current) {
+        makeParticles(filterRef.current);
+      }
     }
     if (href && href !== '#') {
+      const delay = isSameIndex ? 0 : animationTime;
       setTimeout(() => {
-        // Handle hash-based routes (same domain) vs external URLs
-        if (href.startsWith('#')) {
-          window.location.hash = href;
+        if (onNavigate && (href.startsWith('/') || href.startsWith('#'))) {
+          onNavigate(href.replace(/^#/, ''));
         } else {
           window.location.href = href;
         }
-      }, animationTime);
+      }, delay);
     }
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>, index: number) => {

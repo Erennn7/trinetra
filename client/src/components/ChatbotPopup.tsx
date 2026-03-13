@@ -605,7 +605,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
         style={{ 
           position: 'fixed',
           bottom: '24px',
-          left: '24px',
+          right: '24px',
           zIndex: 9999,
           backgroundColor: '#7c3aed',
           color: 'white',
@@ -656,7 +656,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
               style={{
                 position: 'fixed',
                 bottom: '96px',
-                left: '24px',
+                right: '24px',
                 zIndex: 10001,
                 width: '340px',
                 background: '#fff',

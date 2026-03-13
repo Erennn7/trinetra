@@ -126,7 +126,7 @@ const sidebarSections: SidebarSection[] = [
 
 const kpisByRole: Record<Role, KpiConfig[]> = {
   admin: [
-    { label: 'Active Cameras', value: '1,248', badge: '+12%', badgeClass: 'text-emerald-400 bg-emerald-400/10', icon: Video, iconClass: 'text-violet-400', iconBg: 'bg-violet-500/10', progress: 75, progressClass: 'bg-violet-500' },
+    { label: 'Active Cameras', value: '12', badge: '+12%', badgeClass: 'text-emerald-400 bg-emerald-400/10', icon: Video, iconClass: 'text-violet-400', iconBg: 'bg-violet-500/10', progress: 75, progressClass: 'bg-violet-500' },
     { label: 'Crowd Index', value: '42%', badge: '+5%', badgeClass: 'text-emerald-400 bg-emerald-400/10', icon: Users, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', progress: 42, progressClass: 'bg-blue-500' },
     { label: 'Threat Level', value: 'Low', badge: 'Stable', badgeClass: 'text-slate-400 bg-slate-400/10', icon: Shield, iconClass: 'text-indigo-400', iconBg: 'bg-indigo-500/10', segments: { active: 1, total: 3 }, accentBorder: true },
     { label: 'System Uptime', value: '99.9%', badge: 'Live', badgeClass: 'text-violet-400 bg-violet-400/10', icon: Cpu, iconClass: 'text-purple-400', iconBg: 'bg-purple-500/10', progress: 99, progressClass: 'bg-purple-500' },
