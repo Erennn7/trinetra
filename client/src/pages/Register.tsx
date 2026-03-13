@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, type Role } from '../context/AuthContext';
+import GradientBlinds from '@/components/GradientBlinds';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -176,12 +177,10 @@ export default function Register() {
           </div>
         </div>
       </div>
-      <div className="relative hidden bg-muted lg:block">
-        <img
-          src="/placeholder.svg"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+      <div className="relative hidden bg-black lg:flex overflow-hidden">
+        <div className="absolute inset-0">
+          <GradientBlinds />
+        </div>
       </div>
     </div>
   );

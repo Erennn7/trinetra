@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
+import GradientBlinds from '@/components/GradientBlinds';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -237,12 +238,10 @@ export default function DoctorSignup() {
           </div>
         </div>
       </div>
-      <div className="relative hidden bg-muted lg:block">
-        <img
-          src="/placeholder.svg"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+      <div className="relative hidden bg-black lg:flex overflow-hidden">
+        <div className="absolute inset-0">
+          <GradientBlinds />
+        </div>
       </div>
     </div>
   );
