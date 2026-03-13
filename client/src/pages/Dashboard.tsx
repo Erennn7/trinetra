@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, type Role } from '../context/AuthContext';
+import { collection, onSnapshot, query, type DocumentData } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import Squares from '../components/Squares';
 import { useTheme } from '../components/use-theme';
 import { cn } from '@/lib/utils';
@@ -43,6 +45,16 @@ interface KpiConfig {
   progressClass?: string;
   segments?: { active: number; total: number };
   accentBorder?: boolean;
+}
+
+type LostAndFoundStatus = 'pending' | 'processing' | 'completed' | 'not_found';
+
+interface LostAndFoundStats {
+  total: number;
+  pending: number;
+  processing: number;
+  completed: number;
+  not_found: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -297,8 +309,42 @@ export default function Dashboard() {
     (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lostAndFoundStats, setLostAndFoundStats] = useState<LostAndFoundStats>({
+    total: 0,
+    pending: 0,
+    processing: 0,
+    completed: 0,
+    not_found: 0,
+  });
   const kpis = kpisByRole[role] ?? kpisByRole.user;
   const visibleModules = featureModules.filter((m) => m.roles.includes(role));
+
+  useEffect(() => {
+    if (role !== 'admin') return;
+
+    const requestsRef = query(collection(db, 'search_requests'));
+    const unsub = onSnapshot(requestsRef, (snap) => {
+      const initialStats: LostAndFoundStats = {
+        total: snap.size,
+        pending: 0,
+        processing: 0,
+        completed: 0,
+        not_found: 0,
+      };
+
+      const computedStats = snap.docs.reduce((acc, doc) => {
+        const status = (doc.data() as DocumentData).status as LostAndFoundStatus | undefined;
+        if (status && status in acc) {
+          acc[status] += 1;
+        }
+        return acc;
+      }, initialStats);
+
+      setLostAndFoundStats(computedStats);
+    });
+
+    return unsub;
+  }, [role]);
 
   const handleNav = (route: string) => {
     setSidebarOpen(false);
@@ -539,6 +585,25 @@ export default function Dashboard() {
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
+
+              {role === 'admin' && (
+                <div className={cn('mb-4 rounded-xl p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3', GLASS)}>
+                  {[
+                    { label: 'Total Cases', value: lostAndFoundStats.total, color: 'text-violet-400' },
+                    { label: 'Pending', value: lostAndFoundStats.pending, color: 'text-amber-400' },
+                    { label: 'Processing', value: lostAndFoundStats.processing, color: 'text-blue-400' },
+                    { label: 'Found', value: lostAndFoundStats.completed, color: 'text-emerald-400' },
+                    { label: 'Not Found', value: lostAndFoundStats.not_found, color: 'text-red-400' },
+                  ].map((stat) => (
+                    <div key={stat.label} className="rounded-lg border border-border/50 bg-background/40 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {stat.label}
+                      </p>
+                      <p className={cn('text-xl font-bold mt-1', stat.color)}>{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {feedData.map((feed) => (

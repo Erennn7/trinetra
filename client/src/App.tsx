@@ -31,7 +31,7 @@ import VoiceNavigator from './components/VoiceNavigator';
 
 const navItems = [
   { label: 'Home', href: 'http://localhost:3000/' },
-  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Dashboard', href: '#/dashboard' },
   { label: 'About', href: '#' },
 ];
 
@@ -39,20 +39,21 @@ function NavBar() {
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
-      <a href="http://localhost:3000" className="notranslate" style={{ position: 'absolute', left: '1.5rem', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const }}>TRINETRA</a>
-      <GooeyNav
-        items={navItems}
-        particleCount={15}
-        particleDistances={[90, 10]}
-        particleR={100}
-        initialActiveIndex={1}
-        animationTime={600}
-        timeVariance={300}
-        colors={[1, 2, 3, 1, 2, 3, 1, 4]}
-        onNavigate={(href) => navigate(href)}
-      />
-      <div style={{ position: 'absolute', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
+      <a href="http://localhost:3000" className="notranslate" style={{ color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, whiteSpace: 'nowrap' as const, width: '100px' }}>TRINETRA</a>
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <GooeyNav
+          items={navItems}
+          particleCount={15}
+          particleDistances={[90, 10]}
+          particleR={100}
+          initialActiveIndex={1}
+          animationTime={600}
+          timeVariance={300}
+          colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+        />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', width: '260px', justifyContent: 'flex-end' }}>
         <LanguageSwitcher />
         <ModeToggle />
         {profile && (
