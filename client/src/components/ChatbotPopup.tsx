@@ -19,7 +19,7 @@ type WeatherData = {
   visibility: number;
 };
 
-const GEMINI_API_KEY = "AIzaSyDet3utDcBEIWj--zxZ-kZxngTU3-Cbm_U";
+const GEMINI_API_KEY = "AIzaSyDFwnF-E-fcT28jmc73UwE3SOgeqREi-wc";
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent";
 const OPENWEATHER_API_KEY = "2bed468ad9cd7cec460b4ec6dfd2f58c";
 const OPENWEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
@@ -607,11 +607,11 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
           bottom: '24px',
           left: '24px',
           zIndex: 9999,
-          backgroundColor: '#f97316',
+          backgroundColor: '#7c3aed',
           color: 'white',
           padding: '16px',
           borderRadius: '50%',
-          border: '2px solid #ea580c',
+          border: '2px solid #6d28d9',
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
           cursor: 'pointer',
           display: 'flex',
@@ -662,7 +662,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
                 background: '#fff',
                 borderRadius: '16px',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                border: '1px solid rgba(249,115,22,0.3)',
+                border: '1px solid rgba(124,58,237,0.3)',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
@@ -670,7 +670,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
             >
               {/* Header */}
               <div style={{
-                background: 'linear-gradient(to right, #f97316, #ea580c)',
+                background: 'linear-gradient(to right, #7c3aed, #6d28d9)',
                 padding: '12px 14px',
                 display: 'flex',
                 alignItems: 'center',
@@ -682,7 +682,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
                     width: '24px', height: '24px', background: '#fff', borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <span style={{ color: '#f97316', fontWeight: 700, fontSize: '12px' }}>T</span>
+                    <span style={{ color: '#7c3aed', fontWeight: 700, fontSize: '12px' }}>T</span>
                   </div>
                   <div>
                     <div style={{ color: '#fff', fontWeight: 700, fontSize: '13px' }}>Trinetra Safety</div>
@@ -748,7 +748,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
                   }}>
                     {chat.length === 0 && (
                       <div style={{ textAlign: 'center', padding: '24px 0' }}>
-                        <Volume2 size={24} style={{ margin: '0 auto 8px', color: '#f97316' }} />
+                        <Volume2 size={24} style={{ margin: '0 auto 8px', color: '#7c3aed' }} />
                         <div style={{ fontWeight: 600, color: '#374151', fontSize: '13px', marginBottom: '4px' }}>
                           Trinetra Safety Assistant
                         </div>
@@ -768,7 +768,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
                       >
                         <div style={{
                           maxWidth: '85%', padding: '8px 10px', borderRadius: '10px',
-                          background: msg.sender === "user" ? '#f97316' : '#f3f4f6',
+                          background: msg.sender === "user" ? '#7c3aed' : '#f3f4f6',
                           color: msg.sender === "user" ? '#fff' : '#1f2937',
                         }}>
                           <div style={{
@@ -820,7 +820,7 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
                         onClick={handleSend} 
                         disabled={loading || !input.trim()} 
                         style={{
-                          padding: '6px 12px', background: '#f97316', color: '#fff',
+                          padding: '6px 12px', background: '#7c3aed', color: '#fff',
                           borderRadius: '6px', border: 'none', cursor: 'pointer',
                           fontSize: '12px', opacity: loading || !input.trim() ? 0.5 : 1,
                         }}
@@ -839,8 +839,8 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
                           padding: '8px 16px', borderRadius: '8px', border: 'none',
                           cursor: loading ? 'not-allowed' : 'pointer',
                           color: '#fff', fontSize: '13px', fontWeight: 500,
-                          background: isListening ? '#ef4444' : isSpeaking ? '#3b82f6' : 'linear-gradient(to right, #f97316, #ea580c)',
-                          backgroundColor: isListening ? '#ef4444' : isSpeaking ? '#3b82f6' : '#f97316',
+                          background: isListening ? '#ef4444' : isSpeaking ? '#3b82f6' : 'linear-gradient(to right, #7c3aed, #6d28d9)',
+                          backgroundColor: isListening ? '#ef4444' : isSpeaking ? '#3b82f6' : '#7c3aed',
                           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                         }}
                       >
@@ -872,10 +872,10 @@ CRITICAL: Your ENTIRE response must be in ${language} language only. Do not mix 
               {isMinimized && (
                 <div style={{
                   height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: '#fff7ed',
+                  background: '#f5f3ff',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ color: '#c2410c', fontSize: '12px', fontWeight: 500 }}>Ready</span>
+                    <span style={{ color: '#6d28d9', fontSize: '12px', fontWeight: 500 }}>Ready</span>
                     <div style={{
                       width: '6px', height: '6px', background: '#22c55e', borderRadius: '50%',
                     }} />

@@ -2,6 +2,12 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleMap, LoadScript, HeatmapLayer } from '@react-google-maps/api';
 import ReactMarkdown from 'react-markdown';
+import {
+  ArrowLeft, Globe, WifiOff, Volume2, VolumeX, Mic, MicOff,
+  Search, Bot, TrafficCone, Hospital, Droplets, Siren, Shield,
+  Map as MapIcon, PanelLeftClose, Loader2, Navigation,
+  X, ChevronRight, Clock, Route, Footprints,
+} from 'lucide-react';
 import './AIMap.css';
 
 const containerStyle = { width: '100%', height: '100vh' };
@@ -13,7 +19,7 @@ const DEFAULT_ANCHOR_QUERY = 'SKN Sinhgad College of Engineering, Korti, Pandhar
 const DEFAULT_ANCHOR_TITLE = 'SKN Sinhgad College of Engineering';
 const GOOGLE_MAPS_API_KEY = 'AIzaSyBIOC5weP0UHUucbi4EwAMAk-ollFzJ5nA';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent';
-const GEMINI_API_KEY = 'AIzaSyD4kP1b67BdXtk0Gioelg2DdKMztDoclC0';
+const GEMINI_API_KEY = 'AIzaSyDFwnF-E-fcT28jmc73UwE3SOgeqREi-wc';
 
 // --- Multilingual Config ---
 type LangCode = 'en' | 'hi' | 'bn' | 'ta' | 'te' | 'mr' | 'gu' | 'kn' | 'ur' | 'pa';
@@ -33,7 +39,7 @@ const LANGUAGES: { code: LangCode; label: string; nativeLabel: string; sttCode: 
 
 const UI_STRINGS: Record<LangCode, Record<string, string>> = {
   en: {
-    backBtn: '← Dashboard',
+    backBtn: 'Dashboard',
     offlineMode: 'Offline Mode',
     speaking: 'Speaking...',
     listening: 'Listening...',
@@ -67,7 +73,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'Language',
   },
   hi: {
-    backBtn: '← डैशबोर्ड',
+    backBtn: 'डैशबोर्ड',
     offlineMode: 'ऑफ़लाइन मोड',
     speaking: 'बोल रहा है...',
     listening: 'सुन रहा है...',
@@ -101,7 +107,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'भाषा',
   },
   bn: {
-    backBtn: '← ড্যাশবোর্ড',
+    backBtn: 'ড্যাশবোর্ড',
     offlineMode: 'অফলাইন মোড',
     speaking: 'বলছে...',
     listening: 'শুনছে...',
@@ -135,7 +141,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'ভাষা',
   },
   ta: {
-    backBtn: '← டாஷ்போர்ட்',
+    backBtn: 'டாஷ்போர்ட்',
     offlineMode: 'ஆஃப்லைன் பயன்முறை',
     speaking: 'பேசுகிறது...',
     listening: 'கேட்கிறது...',
@@ -169,7 +175,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'மொழி',
   },
   te: {
-    backBtn: '← డాష్‌బోర్డ్',
+    backBtn: 'డాష్‌బోర్డ్',
     offlineMode: 'ఆఫ్‌లైన్ మోడ్',
     speaking: 'మాట్లాడుతోంది...',
     listening: 'వింటోంది...',
@@ -203,7 +209,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'భాష',
   },
   mr: {
-    backBtn: '← डॅशबोर्ड',
+    backBtn: 'डॅशबोर्ड',
     offlineMode: 'ऑफलाइन मोड',
     speaking: 'बोलत आहे...',
     listening: 'ऐकत आहे...',
@@ -237,7 +243,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'भाषा',
   },
   gu: {
-    backBtn: '← ડેશબોર્ડ',
+    backBtn: 'ડેશબોર્ડ',
     offlineMode: 'ઑફલાઇન મોડ',
     speaking: 'બોલી રહ્યું છે...',
     listening: 'સાંભળી રહ્યું છે...',
@@ -271,7 +277,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'ભાષા',
   },
   kn: {
-    backBtn: '← ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+    backBtn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
     offlineMode: 'ಆಫ್‌ಲೈನ್ ಮೋಡ್',
     speaking: 'ಮಾತನಾಡುತ್ತಿದೆ...',
     listening: 'ಕೇಳುತ್ತಿದೆ...',
@@ -305,7 +311,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'ಭಾಷೆ',
   },
   ur: {
-    backBtn: '← ڈیش بورڈ',
+    backBtn: 'ڈیش بورڈ',
     offlineMode: 'آف لائن موڈ',
     speaking: 'بول رہا ہے...',
     listening: 'سن رہا ہے...',
@@ -339,7 +345,7 @@ const UI_STRINGS: Record<LangCode, Record<string, string>> = {
     language: 'زبان',
   },
   pa: {
-    backBtn: '← ਡੈਸ਼ਬੋਰਡ',
+    backBtn: 'ਡੈਸ਼ਬੋਰਡ',
     offlineMode: 'ਆਫ਼ਲਾਈਨ ਮੋਡ',
     speaking: 'ਬੋਲ ਰਿਹਾ ਹੈ...',
     listening: 'ਸੁਣ ਰਿਹਾ ਹੈ...',
@@ -593,6 +599,13 @@ const LEGACY_MAP_CACHE_KEYS = ['kumbh-mela-map-cache'];
 const OFFLINE_DB_NAME = 'PandharpurAIGuideOfflineDB';
 const OFFLINE_CENTER_KEY = 'pandharpur-ai-guide-center';
 
+const FACILITY_ICONS: Record<FacilityCategoryKey, React.ComponentType<{ className?: string; size?: number }>> = {
+  hospital: Hospital,
+  sanitation: Droplets,
+  emergency: Siren,
+  police: Shield,
+};
+
 const FACILITY_CONFIG: Record<
   FacilityCategoryKey,
   {
@@ -600,7 +613,6 @@ const FACILITY_CONFIG: Record<
     radius: number;
     color: string;
     symbol: MarkerSymbol;
-    emoji: string;
   }
 > = {
   hospital: {
@@ -608,7 +620,6 @@ const FACILITY_CONFIG: Record<
     radius: 12000,
     color: '#dc2626',
     symbol: 'medical',
-    emoji: '🏥',
   },
   sanitation: {
     queries: [
@@ -619,7 +630,6 @@ const FACILITY_CONFIG: Record<
     radius: 10000,
     color: '#0f766e',
     symbol: 'sanitation',
-    emoji: '🚻',
   },
   emergency: {
     queries: [
@@ -630,14 +640,12 @@ const FACILITY_CONFIG: Record<
     radius: 12000,
     color: '#d97706',
     symbol: 'emergency',
-    emoji: '🚨',
   },
   police: {
     queries: [`police station near ${DEFAULT_ANCHOR_QUERY}`],
     radius: 12000,
     color: '#2563eb',
     symbol: 'police',
-    emoji: '👮',
   },
 };
 
@@ -716,11 +724,22 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
   const anchorMarkerRef = useRef<google.maps.Marker | null>(null);
   const anchorResolvedRef = useRef(false);
   const defaultFacilitiesLoadedRef = useRef(false);
+  const userLocationMarkerRef = useRef<google.maps.Marker | null>(null);
+  const userLocationAccuracyRef = useRef<google.maps.Circle | null>(null);
+  const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
+  const watchIdRef = useRef<number | null>(null);
+  const userLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapCached, setMapCached] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [searchMarker, setSearchMarker] = useState<google.maps.Marker | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [directionSteps, setDirectionSteps] = useState<{ instruction: string; distance: string; duration: string }[]>([]);
+  const [routeSummary, setRouteSummary] = useState<{ distance: string; duration: string } | null>(null);
+  const [showDirectionsPanel, setShowDirectionsPanel] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showTraffic, setShowTraffic] = useState(true);
@@ -769,12 +788,11 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
         rec.interimResults = false;
         rec.lang = LANGUAGES.find(l => l.code === language)?.sttCode || 'en-IN';
         rec.maxAlternatives = 1;
-        rec.onstart = () => { setIsListening(true); speakFeedback(UI_STRINGS[language].listeningFeedback); };
+        rec.onstart = () => { stopSpeaking(); setIsListening(true); };
         rec.onresult = e => {
           const transcript = e.results[0][0].transcript;
           setSearchInput(transcript);
           setIsListening(false);
-          speakFeedback(`${UI_STRINGS[language].searchingFor} ${transcript}`);
         };
         rec.onerror = () => setIsListening(false);
         rec.onend = () => setIsListening(false);
@@ -896,6 +914,208 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
     if (!isOffline) preloadMapTiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showTraffic, isOffline]);
+
+  // --- Places Autocomplete ---
+  useEffect(() => {
+    if (!mapLoaded || !searchInputRef.current || isOffline || autocompleteRef.current) return;
+
+    const autocomplete = new google.maps.places.Autocomplete(searchInputRef.current, {
+      bounds: new google.maps.LatLngBounds(
+        new google.maps.LatLng(DEFAULT_CENTER.lat - 0.1, DEFAULT_CENTER.lng - 0.1),
+        new google.maps.LatLng(DEFAULT_CENTER.lat + 0.1, DEFAULT_CENTER.lng + 0.1),
+      ),
+      fields: ['geometry', 'name', 'formatted_address'],
+      componentRestrictions: { country: 'in' },
+    });
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry?.location || !mapRef.current) return;
+
+      const loc = place.geometry.location;
+      setSearchInput(place.name || place.formatted_address || '');
+
+      searchMarker?.setMap(null);
+      clearDirections();
+
+      const m = new google.maps.Marker({
+        position: loc,
+        map: mapRef.current,
+        title: place.name,
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+            `<svg width="42" height="48" viewBox="0 0 42 48" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 46c-.8 0-1.6-.3-2.2-1C11.8 37.5 8 32.7 8 24.8 8 15.2 14 8 21 8s13 7.2 13 16.8c0 7.9-3.8 12.7-10.8 20.2-.6.7-1.4 1-2.2 1Z" fill="#7c3aed" stroke="#fff" stroke-width="2"/>
+              <circle cx="21" cy="22" r="7" fill="#fff"/>
+              <circle cx="21" cy="22" r="3.5" fill="#7c3aed"/>
+            </svg>`,
+          ),
+          scaledSize: new google.maps.Size(42, 48),
+          anchor: new google.maps.Point(21, 46),
+        },
+      });
+      setSearchMarker(m);
+      mapRef.current.panTo(loc);
+      mapRef.current.setZoom(16);
+      showDirections(loc);
+
+      const query = place.name || searchInput;
+      if (query) getGeminiReply(query).then(s => { setAiSuggestion(s); setTimeout(() => speakAIResponse(s), 500); });
+    });
+
+    autocompleteRef.current = autocomplete;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLoaded, isOffline]);
+
+  // --- User Location ---
+  const createUserLocationMarker = useCallback((pos: { lat: number; lng: number }) => {
+    if (!mapRef.current) return;
+
+    const position = new google.maps.LatLng(pos.lat, pos.lng);
+    const BLUE = '#4285F4';
+
+    if (userLocationMarkerRef.current) {
+      userLocationMarkerRef.current.setPosition(position);
+      userLocationAccuracyRef.current?.setCenter(position);
+    } else {
+      userLocationMarkerRef.current = new google.maps.Marker({
+        position,
+        map: mapRef.current,
+        title: 'Your Location',
+        icon: {
+          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+            `<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="rgba(66,133,244,0.15)" stroke="rgba(66,133,244,0.4)" stroke-width="1.5">
+                <animate attributeName="r" values="14;18;14" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="20" cy="20" r="8" fill="${BLUE}" stroke="#fff" stroke-width="3"/>
+            </svg>`,
+          ),
+          scaledSize: new google.maps.Size(40, 40),
+          anchor: new google.maps.Point(20, 20),
+        },
+        zIndex: 999,
+      });
+
+      userLocationAccuracyRef.current = new google.maps.Circle({
+        map: mapRef.current,
+        center: position,
+        radius: 80,
+        fillColor: BLUE,
+        fillOpacity: 0.08,
+        strokeColor: BLUE,
+        strokeOpacity: 0.25,
+        strokeWeight: 1,
+        clickable: false,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mapLoaded || !navigator.geolocation) {
+      console.warn('[AIMap] Geolocation not available or map not loaded');
+      return;
+    }
+
+    const handlePosition = (pos: GeolocationPosition) => {
+      const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      userLocationRef.current = loc;
+      setUserLocation(loc);
+      createUserLocationMarker(loc);
+    };
+
+    const handleError = (err: GeolocationPositionError) => {
+      console.warn('[AIMap] Geolocation error:', err.code, err.message);
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      handlePosition,
+      handleError,
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+    );
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      handlePosition,
+      handleError,
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 },
+    );
+
+    return () => {
+      if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current);
+    };
+  }, [mapLoaded, createUserLocationMarker]);
+
+  const panToUserLocation = () => {
+    if (!mapRef.current || !userLocation) return;
+    mapRef.current.panTo(userLocation);
+    mapRef.current.setZoom(17);
+  };
+
+  // --- Directions ---
+  const clearDirections = () => {
+    directionsRendererRef.current?.setMap(null);
+    directionsRendererRef.current = null;
+    setDirectionSteps([]);
+    setRouteSummary(null);
+    setShowDirectionsPanel(false);
+  };
+
+  const showDirections = (destination: google.maps.LatLng) => {
+    const loc = userLocationRef.current;
+    if (!mapRef.current || !loc) {
+      console.warn('[AIMap] Cannot show directions — no user location or map');
+      return;
+    }
+
+    if (directionsRendererRef.current) {
+      directionsRendererRef.current.setMap(null);
+    }
+
+    directionsRendererRef.current = new google.maps.DirectionsRenderer({
+      map: mapRef.current,
+      suppressMarkers: false,
+      polylineOptions: {
+        strokeColor: '#7c3aed',
+        strokeWeight: 5,
+        strokeOpacity: 0.8,
+      },
+    });
+
+    const directionsService = new google.maps.DirectionsService();
+    directionsService.route(
+      {
+        origin: new google.maps.LatLng(loc.lat, loc.lng),
+        destination,
+        travelMode: google.maps.TravelMode.WALKING,
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          directionsRendererRef.current!.setDirections(result);
+          const bounds = result.routes[0]?.bounds;
+          if (bounds) mapRef.current!.fitBounds(bounds);
+
+          const leg = result.routes[0]?.legs[0];
+          if (leg) {
+            setRouteSummary({
+              distance: leg.distance?.text || '',
+              duration: leg.duration?.text || '',
+            });
+            setDirectionSteps(
+              leg.steps.map(step => ({
+                instruction: step.instructions,
+                distance: step.distance?.text || '',
+                duration: step.duration?.text || '',
+              })),
+            );
+            setShowDirectionsPanel(true);
+          }
+        } else {
+          console.warn('[AIMap] Directions request failed:', status);
+        }
+      },
+    );
+  };
 
   // --- Traffic ---
   const toggleTraffic = () => {
@@ -1058,7 +1278,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
           icon: createMarkerIcon(config.color, config.symbol),
         });
         const infoWindow = new google.maps.InfoWindow({
-          content: `<div style="padding:8px;max-width:220px"><h3 style="margin:0 0 8px;color:${config.color};font-size:14px">${place.name}</h3><p style="margin:4px 0;font-size:12px;color:#4b5563">${place.address}</p>${place.rating ? `<p style="margin:4px 0;font-size:12px;color:#4b5563">⭐ ${place.rating}/5</p>` : ''}</div>`,
+          content: `<div style="padding:8px;max-width:220px"><h3 style="margin:0 0 8px;color:${config.color};font-size:14px">${place.name}</h3><p style="margin:4px 0;font-size:12px;color:#4b5563">${place.address}</p>${place.rating ? `<p style="margin:4px 0;font-size:12px;color:#a78bfa">★ ${place.rating}/5</p>` : ''}</div>`,
         });
         marker.addListener('click', () => infoWindow.open({ anchor: marker, map: mapRef.current! }));
         return marker;
@@ -1160,20 +1380,39 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
   // --- Search ---
   const handleSearch = async () => {
     if (!searchInput.trim()) return;
+    clearDirections();
+
     const suggestion = await getGeminiReply(searchInput);
     setAiSuggestion(suggestion);
     setTimeout(() => speakAIResponse(suggestion), 500);
     if (!isOffline && mapRef.current) {
       const service = new google.maps.places.PlacesService(mapRef.current);
-      service.textSearch({ query: `${searchInput} near ${DEFAULT_ANCHOR_QUERY}`, location: getReferenceLocation(), radius: 12000 }, (results, status) => {
+      const query = searchInput.trim();
+      service.textSearch({ query, location: getReferenceLocation() }, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.[0]) {
           const loc = results[0].geometry?.location;
           if (!loc) return;
           searchMarker?.setMap(null);
-          const m = new google.maps.Marker({ position: loc, map: mapRef.current!, title: results[0].name });
+          const m = new google.maps.Marker({
+            position: loc,
+            map: mapRef.current!,
+            title: results[0].name,
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+                `<svg width="42" height="48" viewBox="0 0 42 48" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 46c-.8 0-1.6-.3-2.2-1C11.8 37.5 8 32.7 8 24.8 8 15.2 14 8 21 8s13 7.2 13 16.8c0 7.9-3.8 12.7-10.8 20.2-.6.7-1.4 1-2.2 1Z" fill="#7c3aed" stroke="#fff" stroke-width="2"/>
+                  <circle cx="21" cy="22" r="7" fill="#fff"/>
+                  <circle cx="21" cy="22" r="3.5" fill="#7c3aed"/>
+                </svg>`,
+              ),
+              scaledSize: new google.maps.Size(42, 48),
+              anchor: new google.maps.Point(21, 46),
+            },
+          });
           setSearchMarker(m);
           mapRef.current!.panTo(loc);
-          mapRef.current!.setZoom(16);
+          mapRef.current!.setZoom(14);
+          showDirections(loc);
         }
       });
     }
@@ -1206,7 +1445,10 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
     speakText(`${t.aiGuideSpeakPrefix} ${plain}`);
   };
 
-  const startVoiceInput = () => { try { speechRecRef.current?.start(); } catch { /* ignore */ } };
+  const startVoiceInput = () => {
+    stopSpeaking();
+    setTimeout(() => { try { speechRecRef.current?.start(); } catch { /* ignore */ } }, 200);
+  };
   const stopVoiceInput = () => { speechRecRef.current?.stop(); };
 
   const toggleFacilityCategory = (category: FacilityCategoryKey) => {
@@ -1221,12 +1463,12 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
   return (
     <div className={`aimap-root ${viewMode === 'split' ? 'split-view' : ''}`}>
       {/* Back */}
-      <button className="aimap-back-btn" onClick={() => navigate('/dashboard')}>{t.backBtn}</button>
+      <button className="aimap-back-btn" onClick={() => navigate('/dashboard')}><ArrowLeft size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 6 }} />{t.backBtn}</button>
 
       {/* Language Selector */}
       <div className="aimap-lang-selector">
         <button className="aimap-lang-btn" onClick={() => setShowLangMenu(v => !v)}>
-          <span>🌐</span><span>{LANGUAGES.find(l => l.code === language)?.nativeLabel}</span>
+          <Globe size={16} /><span>{LANGUAGES.find(l => l.code === language)?.nativeLabel}</span>
         </button>
         {showLangMenu && (
           <div className="aimap-lang-menu">
@@ -1245,9 +1487,9 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
       </div>
 
       {/* Status indicators */}
-      {isOffline && <div className="aimap-offline-indicator"><span>📱</span><span>{t.offlineMode}</span></div>}
-      {isSpeaking && <div className="aimap-voice-indicator"><span>🔊</span><span>{t.speaking}</span></div>}
-      {isListening && <div className="aimap-voice-input-indicator"><span>🎤</span><span>{t.listening}</span></div>}
+      {isOffline && <div className="aimap-offline-indicator"><WifiOff size={16} /><span>{t.offlineMode}</span></div>}
+      {isSpeaking && <div className="aimap-voice-indicator"><Volume2 size={16} /><span>{t.speaking}</span></div>}
+      {isListening && <div className="aimap-voice-input-indicator"><Mic size={16} /><span>{t.listening}</span></div>}
 
       {/* Loading */}
       {!mapLoaded && (
@@ -1269,6 +1511,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
       {/* Search */}
       <div className="aimap-search-container">
         <input
+          ref={searchInputRef}
           className="aimap-search-input"
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
@@ -1276,10 +1519,10 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
           placeholder={isOffline ? mapCopy.searchOfflinePlaceholder : mapCopy.searchPlaceholder}
         />
         <button className="aimap-voice-input-button" onClick={isListening ? stopVoiceInput : startVoiceInput} disabled={!speechRecRef.current}>
-          {isListening ? '🔴' : '🎤'}
+          {isListening ? <MicOff size={18} /> : <Mic size={18} />}
         </button>
         <button className="aimap-search-button" onClick={handleSearch} disabled={isLoading}>
-          {isLoading ? <div className="aimap-loading-spinner-sm" /> : '🔍'}
+          {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
         </button>
       </div>
 
@@ -1287,7 +1530,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
       {aiSuggestion && viewMode === 'split' && (
         <div className="aimap-ai-panel">
           <div className="aimap-ai-header">
-            <span>🤖</span><span>{t.aiHeader}</span>
+            <Bot size={20} /><span>{t.aiHeader}</span>
             {trafficData && (
               <div className="aimap-traffic-indicator">
                 <span className={`aimap-traffic-dot ${trafficData.trafficLevel}`} />
@@ -1298,7 +1541,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
           <div className="aimap-ai-content"><ReactMarkdown>{aiSuggestion}</ReactMarkdown></div>
           <div className="aimap-ai-actions">
             <button className="aimap-voice-action-button" onClick={() => speakAIResponse(aiSuggestion)} disabled={isSpeaking}>
-              {isSpeaking ? `🔇 ${t.stop}` : `🔊 ${t.readAloud}`}
+              {isSpeaking ? <><VolumeX size={16} /> {t.stop}</> : <><Volume2 size={16} /> {t.readAloud}</>}
             </button>
           </div>
         </div>
@@ -1308,7 +1551,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
       {aiSuggestion && viewMode === 'full' && (
         <div className="aimap-ai-suggestion">
           <div className="aimap-ai-header">
-            <span>🤖</span><span>{t.aiHeader}</span>
+            <Bot size={20} /><span>{t.aiHeader}</span>
             {trafficData && (
               <div className="aimap-traffic-indicator">
                 <span className={`aimap-traffic-dot ${trafficData.trafficLevel}`} />
@@ -1319,7 +1562,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
           <div className="aimap-ai-content"><ReactMarkdown>{aiSuggestion}</ReactMarkdown></div>
           <div className="aimap-ai-actions">
             <button className="aimap-voice-action-button" onClick={() => speakAIResponse(aiSuggestion)} disabled={isSpeaking}>
-              {isSpeaking ? `🔇 ${t.stop}` : `🔊 ${t.readAloud}`}
+              {isSpeaking ? <><VolumeX size={16} /> {t.stop}</> : <><Volume2 size={16} /> {t.readAloud}</>}
             </button>
           </div>
         </div>
@@ -1359,35 +1602,67 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
         </GoogleMap>
       </LoadScript>
 
-      {/* Controls */}
-      <div className="aimap-control-panel">
-        <button className={`aimap-control-button ${showTraffic ? 'active' : ''}`} onClick={toggleTraffic} disabled={isOffline}>
-          <span>🚦</span><span>{showTraffic ? t.trafficOn : t.trafficOff}</span>
+      {/* Compact bottom toolbar */}
+      <div className="aimap-bottom-bar">
+        <button className={`aimap-bar-btn ${showTraffic ? 'active' : ''}`} onClick={toggleTraffic} disabled={isOffline} title={showTraffic ? t.trafficOn : t.trafficOff}>
+          <TrafficCone size={18} />
         </button>
-        {FACILITY_CATEGORY_KEYS.map(category => (
-          <button
-            key={category}
-            className={`aimap-control-button ${activeFacilities[category] ? 'active' : ''}`}
-            onClick={() => toggleFacilityCategory(category)}
-          >
-            <span>{FACILITY_CONFIG[category].emoji}</span>
-            <span>
-              {formatTemplate(
-                activeFacilities[category] ? mapCopy.hideTemplate : mapCopy.nearbyTemplate,
-                { places: facilityNames[category] },
-              )}
-            </span>
-          </button>
-        ))}
-        <button className={`aimap-control-button ${viewMode === 'split' ? 'active' : ''}`} onClick={() => setViewMode(v => v === 'full' ? 'split' : 'full')}>
-          <span>{viewMode === 'split' ? '🗺️' : '📋'}</span><span>{viewMode === 'split' ? t.fullMap : t.splitView}</span>
+        {FACILITY_CATEGORY_KEYS.map(category => {
+          const FacIcon = FACILITY_ICONS[category];
+          return (
+            <button
+              key={category}
+              className={`aimap-bar-btn ${activeFacilities[category] ? 'active' : ''}`}
+              onClick={() => toggleFacilityCategory(category)}
+              title={formatTemplate(activeFacilities[category] ? mapCopy.hideTemplate : mapCopy.nearbyTemplate, { places: facilityNames[category] })}
+            >
+              <FacIcon size={18} />
+            </button>
+          );
+        })}
+        <button className={`aimap-bar-btn ${userLocation ? 'active' : ''}`} onClick={panToUserLocation} disabled={!userLocation} title="My Location">
+          <Navigation size={18} />
         </button>
-        <button className={`aimap-control-button ${isSpeaking ? 'active' : ''}`} onClick={isSpeaking ? stopSpeaking : () => speakText(t.voiceEnabled)}>
-          <span>{isSpeaking ? '🔇' : '🔊'}</span><span>{isSpeaking ? t.stopVoice : t.voiceGuide}</span>
+        <button className={`aimap-bar-btn ${viewMode === 'split' ? 'active' : ''}`} onClick={() => setViewMode(v => v === 'full' ? 'split' : 'full')} title={viewMode === 'split' ? t.fullMap : t.splitView}>
+          {viewMode === 'split' ? <MapIcon size={18} /> : <PanelLeftClose size={18} />}
         </button>
-        {mapCached && <div className="aimap-cache-status"><span>💾</span><span>{mapCopy.cachedStatus}</span></div>}
-        {isOffline && <div className="aimap-offline-status"><span>📱</span><span>{mapCopy.offlineStatus}</span></div>}
+        <button className={`aimap-bar-btn ${isSpeaking ? 'active' : ''}`} onClick={isSpeaking ? stopSpeaking : () => speakText(t.voiceEnabled)} title={isSpeaking ? t.stopVoice : t.voiceGuide}>
+          {isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </button>
       </div>
+
+      {/* Turn-by-turn directions panel */}
+      {showDirectionsPanel && directionSteps.length > 0 && (
+        <div className="aimap-directions-panel">
+          <div className="aimap-directions-header">
+            <div className="aimap-directions-title">
+              <Route size={18} />
+              <span>Directions</span>
+            </div>
+            {routeSummary && (
+              <div className="aimap-directions-summary">
+                <span className="aimap-directions-chip"><Footprints size={13} /> {routeSummary.distance}</span>
+                <span className="aimap-directions-chip"><Clock size={13} /> {routeSummary.duration}</span>
+              </div>
+            )}
+            <button className="aimap-directions-close" onClick={clearDirections}><X size={16} /></button>
+          </div>
+          <div className="aimap-directions-steps">
+            {directionSteps.map((step, i) => (
+              <div key={i} className="aimap-directions-step">
+                <div className="aimap-step-number">{i + 1}</div>
+                <div className="aimap-step-body">
+                  <div className="aimap-step-instruction" dangerouslySetInnerHTML={{ __html: step.instruction }} />
+                  <div className="aimap-step-meta">
+                    <span>{step.distance}</span>
+                    {step.duration && <><ChevronRight size={12} /><span>{step.duration}</span></>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

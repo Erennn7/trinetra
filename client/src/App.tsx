@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { DisasterDataProvider } from './context/DisasterDataContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Dashboard from './pages/Dashboard';
@@ -12,35 +11,13 @@ import ImageRecognition from './pages/ImageRecognition';
 import UserLostAndFound from './pages/UserLostAndFound';
 import AdminLostAndFound from './pages/AdminLostAndFound';
 import DoctorRegistration from './pages/DoctorRegistration';
+import DoctorAssistance from './pages/DoctorAssistance';
 import DoctorSignup from './pages/DoctorSignup';
 import PilgrimTracker from './pages/PilgrimTracker';
+import DisasterPrediction from './pages/DisasterPrediction';
+import DisasterManagement from './pages/DisasterManagement';
 import AIMap from './pages/AIMap';
 import Analytics from './pages/Analytics';
-
-import DisasterLayout from './components/DisasterLayout';
-import DisasterDashboard from './pages/disaster/DisasterDashboard';
-import DisasterWeather from './pages/disaster/DisasterWeather';
-import DisasterEarthquake from './pages/disaster/DisasterEarthquake';
-import DisasterCrowd from './pages/disaster/DisasterCrowd';
-import DisasterTraffic from './pages/disaster/DisasterTraffic';
-import DisasterAlerts from './pages/disaster/DisasterAlerts';
-import DisasterEmergency from './pages/disaster/DisasterEmergency';
-import DisasterSatellite from './pages/disaster/DisasterSatellite';
-import DisasterPilgrim from './pages/disaster/DisasterPilgrim';
-import DisasterApiTest from './pages/disaster/DisasterApiTest';
-
-import DoctorLayout from './components/DoctorLayout';
-import DoctorDashboard from './pages/doctor/DoctorDashboard';
-import DoctorVideoQueue from './pages/doctor/DoctorVideoQueue';
-import DoctorProfile from './pages/doctor/DoctorProfile';
-
-import MedicalLayout from './components/MedicalLayout';
-import MedicalDashboard from './pages/medical/MedicalDashboard';
-import MedicalVideoQueue from './pages/medical/MedicalVideoQueue';
-import MedicalDoctors from './pages/medical/MedicalDoctors';
-import MedicalHospitals from './pages/medical/MedicalHospitals';
-
-import EmergencyCall from './pages/EmergencyCall';
 
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
@@ -48,7 +25,6 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { ModeToggle } from './components/mode-toggle';
 import { Avatar, AvatarFallback } from './components/ui/avatar';
 import { useAuth } from './context/AuthContext';
-import ChatbotPopup from './components/ChatbotPopup';
 
 const navItems = [
   { label: 'Home', href: 'http://localhost:3000/' },
@@ -115,62 +91,20 @@ function App() {
             <Route path="/weapon-detection" element={<ProtectedRoute allowedRoles={['admin']}><WeaponDetection /></ProtectedRoute>} />
             <Route path="/crowd-detection" element={<ProtectedRoute allowedRoles={['admin']}><CrowdDetection /></ProtectedRoute>} />
             <Route path="/image-recognition" element={<ProtectedRoute allowedRoles={['admin']}><ImageRecognition /></ProtectedRoute>} />
+            <Route path="/disaster-prediction" element={<ProtectedRoute allowedRoles={['admin']}><DisasterPrediction /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute allowedRoles={['admin']}><Analytics /></ProtectedRoute>} />
-
-            {/* Disaster Prediction — nested routes with sidebar layout */}
-            <Route path="/disaster-prediction" element={<ProtectedRoute allowedRoles={['admin', 'user']}><DisasterDataProvider><DisasterLayout /></DisasterDataProvider></ProtectedRoute>}>
-              <Route index element={<DisasterDashboard />} />
-              <Route path="weather" element={<DisasterWeather />} />
-              <Route path="earthquakes" element={<DisasterEarthquake />} />
-              <Route path="crowd" element={<DisasterCrowd />} />
-              <Route path="traffic" element={<DisasterTraffic />} />
-              <Route path="alerts" element={<DisasterAlerts />} />
-              <Route path="emergency" element={<DisasterEmergency />} />
-              <Route path="satellite" element={<DisasterSatellite />} />
-              <Route path="pilgrim" element={<DisasterPilgrim />} />
-              <Route path="api-test" element={<DisasterApiTest />} />
-            </Route>
-
-            {/* Disaster Management — same layout, different entry point */}
-            <Route path="/disaster-management" element={<ProtectedRoute allowedRoles={['admin', 'user']}><DisasterDataProvider><DisasterLayout /></DisasterDataProvider></ProtectedRoute>}>
-              <Route index element={<DisasterDashboard />} />
-              <Route path="weather" element={<DisasterWeather />} />
-              <Route path="earthquakes" element={<DisasterEarthquake />} />
-              <Route path="crowd" element={<DisasterCrowd />} />
-              <Route path="traffic" element={<DisasterTraffic />} />
-              <Route path="alerts" element={<DisasterAlerts />} />
-              <Route path="emergency" element={<DisasterEmergency />} />
-              <Route path="satellite" element={<DisasterSatellite />} />
-              <Route path="pilgrim" element={<DisasterPilgrim />} />
-              <Route path="api-test" element={<DisasterApiTest />} />
-            </Route>
-
-            {/* Doctor Panel — nested routes with sidebar */}
-            <Route path="/doctor-panel" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorLayout /></ProtectedRoute>}>
-              <Route index element={<DoctorDashboard />} />
-              <Route path="video-queue" element={<DoctorVideoQueue />} />
-              <Route path="profile" element={<DoctorProfile />} />
-            </Route>
-
-            {/* Medical Admin Panel — nested routes with sidebar */}
-            <Route path="/medical-admin" element={<ProtectedRoute allowedRoles={['medical_admin']}><MedicalLayout /></ProtectedRoute>}>
-              <Route index element={<MedicalDashboard />} />
-              <Route path="video-queue" element={<MedicalVideoQueue />} />
-              <Route path="doctors" element={<MedicalDoctors />} />
-              <Route path="hospitals" element={<MedicalHospitals />} />
-            </Route>
 
             {/* User routes */}
             <Route path="/pilgrim-tracker" element={<ProtectedRoute allowedRoles={['user']}><PilgrimTracker /></ProtectedRoute>} />
-            <Route path="/emergency-call" element={<ProtectedRoute allowedRoles={['user']}><EmergencyCall /></ProtectedRoute>} />
-            <Route path="/doctor-registration" element={<ProtectedRoute allowedRoles={['user', 'medical_admin']}><DoctorRegistration /></ProtectedRoute>} />
+            <Route path="/disaster-management" element={<ProtectedRoute allowedRoles={['user']}><DisasterManagement /></ProtectedRoute>} />
+            <Route path="/doctor-assistance" element={<ProtectedRoute allowedRoles={['user', 'medical_admin', 'doctor']}><DoctorAssistance /></ProtectedRoute>} />
+            <Route path="/doctor-registration" element={<ProtectedRoute allowedRoles={['user']}><DoctorRegistration /></ProtectedRoute>} />
             <Route path="/ai-map" element={<ProtectedRoute allowedRoles={['user']}><AIMap /></ProtectedRoute>} />
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
           <Footer2 />
-          <ChatbotPopup/>
         </div>
       </AuthProvider>
       </ThemeProvider>
