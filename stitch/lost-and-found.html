@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trinetra v3 - Lost &amp; Found Case Viewer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7c3aed",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#0c0a0f",
+                        "surface-dark": "#16121a",
+                        "accent-violet": "#7c3aed",
+                        "accent-blue": "#2563eb"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-image: 
+                linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .glass-panel {
+            background: rgba(22, 18, 26, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.25);
+        }
+        .segmented-control {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px;
+            border-radius: 10px;
+            display: flex;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+        .segmented-button {
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .segmented-button.active {
+            background: #7c3aed;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .segmented-button:not(.active) {
+            color: #94a3b8;
+        }
+        .segmented-button:not(.active):hover {
+            background: rgba(124, 58, 237, 0.1);
+            color: #7c3aed;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<aside class="w-72 border-r border-slate-200 dark:border-primary/10 flex flex-col h-screen sticky top-0 bg-white dark:bg-surface-dark z-50">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">visibility</span>
+</div>
+<div>
+<h1 class="font-bold text-lg leading-none">Trinetra v3</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Surveillance Suite</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">videocam</span>
+<span class="font-medium">Live View</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary border border-primary/20 active-glow" href="#">
+<span class="material-symbols-outlined">person_search</span>
+<span class="font-medium">Lost &amp; Found</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-medium">Reports</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-primary/10">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-4 py-3 bg-slate-100 dark:bg-primary/5 rounded-xl">
+<div class="w-8 h-8 rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar of the current operator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC28n8YsvRhqNYE4dG6vwMacsb4jBCxAkrh4KZSURulnlK5lS8tn39cP074x7wETrZeeXKllep1D8WAQZEu4bHnkTYPsSYqTP9sphIyEoYB4s7XHUPybTglaTCd7EtXBEwiNi8tLGqdXsLduIeN6yZoa5o6s0FCIFdmA2WOInUA_lRBP6XV2GiDeXnUK9fD9pLRvWWmnorzG83sKeArn8XyOpHg1Yd9OcHdX8wMLIbcQN2QA4TMHIILovzg26rjSkgvIg4_hog3wh0"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Operator 042</p>
+<p class="text-xs text-slate-500 truncate">Control Room A</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden">
+<header class="h-20 border-b border-slate-200 dark:border-primary/10 flex items-center justify-between px-8 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<h2 class="text-2xl font-black tracking-tight">Case #LF-8829</h2>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400">Target Tracking: Real-time analysis enabled</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-primary/5 border border-transparent focus:border-primary rounded-xl w-64 text-sm transition-all focus:ring-0" placeholder="Search events..." type="text"/>
+</div>
+<button class="bg-primary text-white px-6 py-2 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-sm">ios_share</span>
+                Export Case
+            </button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8 flex gap-8">
+<div class="flex-1 space-y-8">
+<div class="glass-panel p-4 rounded-xl flex items-center justify-between">
+<div class="flex gap-8">
+<div class="flex flex-col">
+<span class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Search Status</span>
+<span class="text-sm font-bold text-primary">Active Engagement</span>
+</div>
+<div class="flex flex-col border-l border-primary/10 pl-8">
+<span class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Detections</span>
+<span class="text-sm font-bold">12 Total Instances</span>
+</div>
+<div class="flex flex-col border-l border-primary/10 pl-8">
+<span class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Duration</span>
+<span class="text-sm font-bold">02h 14m 32s</span>
+</div>
+</div>
+<div class="segmented-control">
+<button class="segmented-button">Timeline</button>
+<button class="segmented-button active">Grid View</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="group relative bg-white dark:bg-surface-dark rounded-xl overflow-hidden border border-slate-200 dark:border-primary/5 hover:border-primary/40 transition-all">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Subject walking through main lobby captured by security camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATj9FXKE5Nu5oWrR9WQx_mc5mg0UTDf4zjQvMHV0oJtmF0Q018rCCCZcBrA_J-5NumT4MKYYB5IORP-jItn4lqmLbaHCvqG1rAPMzwUhjxt91n8WfFfKc4k6CMmKux7erkeBQuGCqLKPDJnHX-ayHzm6pvhArPHBX077s2bgDjEFMw1JRP9y3FsN1cY8GGGN0RTEQQM7kVkJ4gLILNQ4ISnVteivqCSSg_GJh7wyfEMQTYxRDP2mVM6A1QZOkDVN-3NTDm-mTruJQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> REC
+                        </div>
+<div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+<div>
+<p class="text-white text-sm font-bold">14:22 - Main Lobby</p>
+<p class="text-primary text-[10px] font-bold">98.2% Confidence</p>
+</div>
+<span class="material-symbols-outlined text-white/50 group-hover:text-primary cursor-pointer transition-colors">zoom_in</span>
+</div>
+</div>
+<div class="p-3 text-[11px] text-slate-500 flex justify-between items-center bg-slate-50 dark:bg-black/20">
+<span>CAM-04 ENTRY STACK</span>
+<span class="text-primary font-mono font-bold tracking-tighter">POS: [40.7, -74.0]</span>
+</div>
+</div>
+<div class="group relative bg-white dark:bg-surface-dark rounded-xl overflow-hidden border border-slate-200 dark:border-primary/5 hover:border-primary/40 transition-all">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Subject exiting through parking zone captured by low-angle camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxVOrF5CCsJ40oP1-or6fEyef5U6yrrwvCOybdQ02FBbE8nMc_c4WUqis4TGYZV0l4goKEmal-1wJFVgiglyEXg3-B-__DbZSWtIueDaT_RHvmZGih0zwWLHcu4ot4ehQ1HUQd4Yn_RZujYBnGXRpf2xqEb0YCPCn8LJYtT6Hn7mHectiZlMarmiYUTUymSLmnub2XkESRk_AB5qWrrusAVPW4C6KIo92npbAtxZmDxIixPXqhAXHbt-JEkHWAhQXyxoJcBSdEPQQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+<div>
+<p class="text-white text-sm font-bold">15:45 - Parking Zone B</p>
+<p class="text-primary text-[10px] font-bold">94.5% Confidence</p>
+</div>
+<span class="material-symbols-outlined text-white/50 group-hover:text-primary cursor-pointer transition-colors">zoom_in</span>
+</div>
+</div>
+<div class="p-3 text-[11px] text-slate-500 flex justify-between items-center bg-slate-50 dark:bg-black/20">
+<span>CAM-12 REAR EXIT</span>
+<span class="text-primary font-mono font-bold tracking-tighter">POS: [40.8, -73.9]</span>
+</div>
+</div>
+<div class="group relative bg-white dark:bg-surface-dark rounded-xl overflow-hidden border border-slate-200 dark:border-primary/5 hover:border-primary/40 transition-all">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Subject in east wing corridor captured by high-angle PTZ camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOr-3aadi0NiLOtjCrNRHZB1UyYe5-hlIe0AgizW7tHuj1fk6vvf5WzAZUglTiKadnAl8uN9nk6f7kuOCw1mkmGjdW30nPa3ltnYcMvdVNm9QXcVGxN-q2ZZERVc3Y_e5bYC3em06wrX8iNOXeshBr7PS2swewjJo5jcXyu0WmDf25rgUm-ZBYNOoTBXe8MxdHWzEsZmo73qtw4DgaQdCcFIUztgnHR2MTo2wLumAjQpaKYUrlJzSc8cmLDOkrzTBWihgzbJAKQ9M"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+<div>
+<p class="text-white text-sm font-bold">16:10 - East Wing Corridor</p>
+<p class="text-primary text-[10px] font-bold">89.1% Confidence</p>
+</div>
+<span class="material-symbols-outlined text-white/50 group-hover:text-primary cursor-pointer transition-colors">zoom_in</span>
+</div>
+</div>
+<div class="p-3 text-[11px] text-slate-500 flex justify-between items-center bg-slate-50 dark:bg-black/20">
+<span>CAM-08 PTZ AUTO</span>
+<span class="text-primary font-mono font-bold tracking-tighter">POS: [40.7, -74.1]</span>
+</div>
+</div>
+<div class="group relative bg-white dark:bg-surface-dark rounded-xl overflow-hidden border border-slate-200 dark:border-primary/5 hover:border-primary/40 transition-all">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Subject near cafeteria entrance captured by wide-angle security camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQwexUHz6pHNrGosM4DLr0QvL1_lFTKReUw_K4QW_JVpD6Z1flCTxFAS3a3686ZLt0yF9uvBtlOjF3FP7qQILxe5Ab6cvRWuFMaTWsywTvpmceX0qbkC9cY7oSK_3yaGvNeOgD0BDcWwVXyveF3lDsGXysLaxzRT28QyWEtZ5jEwEFQx-p-LIFGe29XGdvLTsLU0LkvF6qkNDQdTzN-2BwJb50hQJ9f__CoXGa5G_oK0dWb43auHXhp40r7QEIkmsq7wESoaMTPMI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+<div>
+<p class="text-white text-sm font-bold">16:30 - Cafeteria Entrance</p>
+<p class="text-primary text-[10px] font-bold">91.0% Confidence</p>
+</div>
+<span class="material-symbols-outlined text-white/50 group-hover:text-primary cursor-pointer transition-colors">zoom_in</span>
+</div>
+</div>
+<div class="p-3 text-[11px] text-slate-500 flex justify-between items-center bg-slate-50 dark:bg-black/20">
+<span>CAM-05 STATIC WIDE</span>
+<span class="text-primary font-mono font-bold tracking-tighter">POS: [40.6, -74.0]</span>
+</div>
+</div>
+</div>
+</div>
+<div class="w-96 space-y-8">
+<div class="glass-panel rounded-xl overflow-hidden flex flex-col">
+<div class="p-4 border-b border-primary/10 flex justify-between items-center bg-primary/5">
+<h3 class="text-sm font-bold uppercase tracking-widest text-primary">Master Subject Profile</h3>
+<span class="material-symbols-outlined text-primary text-sm">verified_user</span>
+</div>
+<div class="p-6 space-y-6">
+<div class="w-full aspect-square rounded-xl overflow-hidden ring-2 ring-primary/20 bg-slate-200 dark:bg-slate-800">
+<img class="w-full h-full object-cover" data-alt="Clear frontal master image of the subject person" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_aOx38xWM34uUM-XigYzvMiG57H0_6l55U3kLn-vAJjIh8OmHSc57OO4_PJUhnpQcdLTkGmm0_D6RD2Vv52MmLvgD7l4o1625HfJXGogCp9E5WL_Bdb5AdP8UHA_HcBRq2Pumo7S1oJzrVmgGzFLGRdUSNfUKTO4IJsk6KUg9SGuz1Pwgu_1Pax8x_mvkEnZohUtOCtTrx4pIPsheJJ6Hjh1NPeAYLyde_ise6u8tuk6TD0tcLBcn8bRZ5DE3Vt2IkATDtA2yXik"/>
+</div>
+<div class="space-y-3">
+<div class="bg-slate-100 dark:bg-primary/5 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<span class="text-xs text-slate-500 font-bold uppercase tracking-tight">Object Class</span>
+<span class="text-sm font-bold text-slate-100">Person</span>
+</div>
+<div class="bg-slate-100 dark:bg-primary/5 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<span class="text-xs text-slate-500 font-bold uppercase tracking-tight">Primary Color</span>
+<span class="text-sm font-bold flex items-center gap-2 text-slate-100">
+<span class="w-3 h-3 rounded-full bg-blue-900 border border-white/20"></span>
+                                Navy Blue
+                            </span>
+</div>
+<div class="bg-slate-100 dark:bg-primary/5 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<span class="text-xs text-slate-500 font-bold uppercase tracking-tight">Accessory</span>
+<span class="text-sm font-bold text-slate-100">Black Backpack</span>
+</div>
+<div class="bg-slate-100 dark:bg-primary/5 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<span class="text-xs text-slate-500 font-bold uppercase tracking-tight">Height Est.</span>
+<span class="text-sm font-bold text-slate-100">178 cm</span>
+</div>
+<div class="bg-primary/10 p-4 rounded-xl border border-primary/20 mt-4">
+<p class="text-xs font-bold text-primary flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-xs">info</span>
+                                AI Metadata Analysis
+                            </p>
+<p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed italic">
+                                "Subject appears to be moving with intent toward North Exit. Gait analysis suggests 85% match to registered employee ID #9910."
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-panel rounded-xl overflow-hidden h-72 relative">
+<div class="absolute top-4 left-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
+<p class="text-[10px] font-bold text-white flex items-center gap-2 uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm text-primary">location_on</span>
+                        Tactical Trail Map
+                    </p>
+</div>
+<div class="w-full h-full bg-slate-900 overflow-hidden relative">
+<img class="w-full h-full object-cover opacity-30 grayscale contrast-125" data-alt="Tactical top-down map of the building floor plan with movement trails" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUUDyxjnT9venn5Hz0MBWO85L6S_5I_ZB8GmUfA-rnthiD91CjqK3w5M1EJLmjEV17cRbPYAhcC02ojWG1M9ftkXeFdFS3tRVuCvJnhBdps4vTZkFDIBAI_P1CcBg9En9H3WPmcnaRbepojW74p8l6vyCiGUVsUk5MmD274iNYRz7UMr3T2BspMgrH4QsIBOLVOToy-zFA2Gn7zPWl7NMj7xVCVhyb1HTl3RPswXH1Tdg-HkKpSmeE00q73-FV6xk-iRjvOZyzF38"/>
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
+<path d="M 20 40 L 40 60 L 60 45 L 80 70" fill="none" stroke="#7c3aed" stroke-dasharray="2,1" stroke-width="0.7"></path>
+<circle cx="20" cy="40" fill="#7c3aed" r="1.5"></circle>
+<circle cx="40" cy="60" fill="#7c3aed" r="1.5"></circle>
+<circle cx="60" cy="45" fill="#7c3aed" r="1.5"></circle>
+<circle class="animate-pulse" cx="80" cy="70" fill="#7c3aed" r="2.5"></circle>
+</svg>
+<div class="absolute bottom-4 right-4 flex flex-col gap-2">
+<button class="w-8 h-8 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-primary transition-colors"><span class="material-symbols-outlined text-lg">add</span></button>
+<button class="w-8 h-8 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center text-white hover:bg-primary transition-colors"><span class="material-symbols-outlined text-lg">remove</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>
