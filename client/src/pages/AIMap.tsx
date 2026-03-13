@@ -19,7 +19,7 @@ const DEFAULT_ANCHOR_QUERY = 'SKN Sinhgad College of Engineering, Korti, Pandhar
 const DEFAULT_ANCHOR_TITLE = 'SKN Sinhgad College of Engineering';
 const GOOGLE_MAPS_API_KEY = 'AIzaSyBIOC5weP0UHUucbi4EwAMAk-ollFzJ5nA';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent';
-const GEMINI_API_KEY = 'AIzaSyDFwnF-E-fcT28jmc73UwE3SOgeqREi-wc';
+const GEMINI_API_KEY = '';
 
 // --- Multilingual Config ---
 type LangCode = 'en' | 'hi' | 'bn' | 'ta' | 'te' | 'mr' | 'gu' | 'kn' | 'ur' | 'pa';
@@ -741,6 +741,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
   const [routeSummary, setRouteSummary] = useState<{ distance: string; duration: string } | null>(null);
   const [showDirectionsPanel, setShowDirectionsPanel] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('');
+  const [aiSuggestionLang, setAiSuggestionLang] = useState<LangCode>(() => (localStorage.getItem('aimap-lang') as LangCode) || 'en');
   const [isLoading, setIsLoading] = useState(false);
   const [showTraffic, setShowTraffic] = useState(true);
   const [trafficData, setTrafficData] = useState<TrafficData | null>(null);
@@ -960,7 +961,11 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
       showDirections(loc);
 
       const query = place.name || searchInput;
-      if (query) getGeminiReply(query).then(s => { setAiSuggestion(s); setTimeout(() => speakAIResponse(s), 500); });
+      if (query) getGeminiReply(query).then(s => {
+        setAiSuggestion(s);
+        setAiSuggestionLang(language);
+        setTimeout(() => speakAIResponse(s), 500);
+      });
     });
 
     autocompleteRef.current = autocomplete;
@@ -1156,6 +1161,64 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
       return t.fetchError;
     } finally { setIsLoading(false); }
   };
+
+  const translateSuggestionToLanguage = async (
+    suggestion: string,
+    fromLanguage: LangCode,
+    toLanguage: LangCode,
+  ) => {
+    if (!suggestion.trim() || fromLanguage === toLanguage || isOffline) {
+      return suggestion;
+    }
+
+    try {
+      const fromLanguageName = GEMINI_LANG_NAMES[fromLanguage];
+      const toLanguageName = GEMINI_LANG_NAMES[toLanguage];
+      const prompt = [
+        `Translate the following markdown from ${fromLanguageName} to ${toLanguageName}.`,
+        'Preserve markdown structure exactly: headings, bullets, bold text, and line breaks.',
+        'Do not add commentary, explanation, or extra sections.',
+        'Return only translated markdown.',
+        '',
+        suggestion,
+      ].join('\n');
+
+      const res = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      });
+      const data = await res.json();
+      const translated = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      return translated || suggestion;
+    } catch {
+      return suggestion;
+    }
+  };
+
+  useEffect(() => {
+    if (!aiSuggestion.trim() || aiSuggestionLang === language) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const translateCurrentSuggestion = async () => {
+      setIsLoading(true);
+      const translated = await translateSuggestionToLanguage(aiSuggestion, aiSuggestionLang, language);
+      if (!isCancelled) {
+        setAiSuggestion(translated);
+        setAiSuggestionLang(language);
+        setIsLoading(false);
+      }
+    };
+
+    void translateCurrentSuggestion();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [aiSuggestion, aiSuggestionLang, language]);
 
   const getCachedAIResponse = (query: string): Promise<{ suggestion: string; trafficData: TrafficData } | null> =>
     new Promise(resolve => {
@@ -1384,6 +1447,7 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
 
     const suggestion = await getGeminiReply(searchInput);
     setAiSuggestion(suggestion);
+    setAiSuggestionLang(language);
     setTimeout(() => speakAIResponse(suggestion), 500);
     if (!isOffline && mapRef.current) {
       const service = new google.maps.places.PlacesService(mapRef.current);
