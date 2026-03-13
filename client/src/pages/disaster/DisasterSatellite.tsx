@@ -101,14 +101,14 @@ export default function DisasterSatellite() {
               <CardContent>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#F0F4FF', mb: 2 }}>Data Sources</Typography>
                 <Box sx={{ p: 1.5, mb: 2, borderRadius: 2, background: 'rgba(46,213,115,0.08)', border: '1px solid rgba(46,213,115,0.2)' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}><CheckCircle sx={{ fontSize: 16, color: '#2ED573' }} /><Typography variant="caption" sx={{ color: '#2ED573', fontWeight: 700 }}>ESRI World Imagery — ACTIVE</Typography></Box>
-                  <Typography variant="caption" sx={{ color: '#94A3B8' }}>Live satellite tiles from Esri/DigitalGlobe, GeoEye. Always available, no key required. Use the layer switcher on the map to switch views.</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}><CheckCircle sx={{ fontSize: 16, color: '#2ED573' }} /><Typography variant="caption" sx={{ color: '#2ED573', fontWeight: 700 }}>ESRI World Imagery (Map) — ACTIVE</Typography></Box>
+                  <Typography variant="caption" sx={{ color: '#94A3B8' }}>Interactive satellite tiles from Esri/DigitalGlobe, GeoEye. Always available. Use the layer switcher on the map to switch views.</Typography>
                 </Box>
                 <Box sx={{ p: 1.5, mb: 2, borderRadius: 2, background: satelliteData?.image_data ? 'rgba(46,213,115,0.08)' : 'rgba(196,181,253,0.08)', border: `1px solid ${satelliteData?.image_data ? 'rgba(46,213,115,0.2)' : 'rgba(196,181,253,0.2)'}` }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>{satelliteData?.image_data ? <CheckCircle sx={{ fontSize: 16, color: '#2ED573' }} /> : <Info sx={{ fontSize: 16, color: '#c4b5fd' }} />}<Typography variant="caption" sx={{ color: satelliteData?.image_data ? '#2ED573' : '#c4b5fd', fontWeight: 700 }}>Sentinel-2 Analysis — {satelliteData?.image_data ? 'ACTIVE' : 'Credentials needed'}</Typography></Box>
-                  <Typography variant="caption" sx={{ color: '#94A3B8' }}>{satelliteData?.image_data ? 'Enhanced Sentinel-2 RGB imagery (1024×1024, contrast-stretched).' : 'Add SENTINEL_HUB_CLIENT_ID and SENTINEL_HUB_CLIENT_SECRET in backend/.env for Sentinel-2 analysis.'}</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>{satelliteData?.image_data ? <CheckCircle sx={{ fontSize: 16, color: '#2ED573' }} /> : <Info sx={{ fontSize: 16, color: '#c4b5fd' }} />}<Typography variant="caption" sx={{ color: satelliteData?.image_data ? '#2ED573' : '#c4b5fd', fontWeight: 700 }}>Esri Static Snapshot — {satelliteData?.image_data ? 'ACTIVE' : 'Loading...'}</Typography></Box>
+                  <Typography variant="caption" sx={{ color: '#94A3B8' }}>{satelliteData?.image_data ? 'High-resolution static snapshot processed from ArcGIS REST API.' : 'Fetching Esri snapshot...'}</Typography>
                 </Box>
-                {[['Satellite', satelliteData?.satellite || 'Sentinel-2'], ['Resolution', satelliteData?.resolution || '10m'], ['Bands', (satelliteData?.bands || ['B02', 'B03', 'B04']).join(', ')], ['Last fetch', satelliteData?.timestamp ? new Date(satelliteData.timestamp).toLocaleString('en-IN') : '—']].map(([label, val]) => (
+                {[['Satellite', satelliteData?.provider || 'Esri'], ['Resolution', satelliteData?.resolution || '1m'], ['Bands', (satelliteData?.bands || ['RGB']).join(', ')], ['Last fetch', satelliteData?.timestamp ? new Date(satelliteData.timestamp).toLocaleString('en-IN') : '—']].map(([label, val]) => (
                   <Box key={label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.75, borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                     <Typography variant="caption" sx={{ color: '#94A3B8' }}>{label}</Typography>
                     <Typography variant="caption" sx={{ color: '#F0F4FF', fontWeight: 600 }}>{val}</Typography>
@@ -116,8 +116,8 @@ export default function DisasterSatellite() {
                 ))}
                 {satelliteData?.image_data && (
                   <Box sx={{ mt: 2 }}>
-                    <Typography variant="caption" display="block" sx={{ color: '#94A3B8', mb: 1 }}>Sentinel-2 Enhanced Preview (1024×1024)</Typography>
-                    <Box component="img" src={`data:image/png;base64,${satelliteData.image_data}`} alt="Sentinel-2 satellite imagery" sx={{ width: '100%', borderRadius: 2, border: '1px solid rgba(196,181,253,0.2)', cursor: 'pointer' }} onClick={() => window.open(`data:image/png;base64,${satelliteData.image_data}`, '_blank')} />
+                    <Typography variant="caption" display="block" sx={{ color: '#94A3B8', mb: 1 }}>Esri Processed Preview (800×800)</Typography>
+                    <Box component="img" src={`data:image/jpeg;base64,${satelliteData.image_data}`} alt="Esri satellite imagery" sx={{ width: '100%', borderRadius: 2, border: '1px solid rgba(196,181,253,0.2)', cursor: 'pointer' }} onClick={() => window.open(`data:image/jpeg;base64,${satelliteData.image_data}`, '_blank')} />
                     <Typography variant="caption" sx={{ color: '#64748B', mt: 0.5, display: 'block' }}>Click image to view full resolution</Typography>
                   </Box>
                 )}
