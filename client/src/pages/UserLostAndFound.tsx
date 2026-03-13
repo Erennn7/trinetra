@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp,
+  collection, query, where, onSnapshot, addDoc, serverTimestamp,
   type Timestamp,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -23,12 +23,18 @@ interface SearchRequest {
 interface Detection {
   frame: number;
   timestamp_sec: number;
-  frame_image: string;
-  face_crop: string;
+  frame_image?: string;
+  face_crop?: string;
   bbox: number[];
   engine?: string;
   score?: number;
+  saved_file?: string;
+  location?: string;
+  verified_by?: string;
 }
+
+// API URL for fetching saved detection images
+const API_URL = 'http://localhost:5001';
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
   pending: { label: 'Pending Review', color: '#fbbf24', bg: 'rgba(251,191,36,0.1)' },
@@ -61,13 +67,29 @@ export default function UserLostAndFound() {
   // ── Fetch user's search requests ─────────────────────────────────────
   useEffect(() => {
     if (!profile?.uid) return;
+    
+    // Quick fix for Firebase Index issue - removed orderBy for now
+    // If you want orderBy, you must click the link in the console to create the index
     const q = query(
       collection(db, 'search_requests'),
-      where('userId', '==', profile.uid),
-      orderBy('createdAt', 'desc'),
+      where('userId', '==', profile.uid)
     );
+    
     const unsub = onSnapshot(q, (snap) => {
-      setRequests(snap.docs.map((d) => ({ id: d.id, ...d.data() } as SearchRequest)));
+      // Sort manually in JS to avoid needing a Firebase index for now
+      const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as SearchRequest));
+      
+      // Sort descending by createdAt (newest first)
+      docs.sort((a, b) => {
+        const timeA = a.createdAt?.toMillis() || 0;
+        const timeB = b.createdAt?.toMillis() || 0;
+        return timeB - timeA;
+      });
+      
+      setRequests(docs);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching requests:", error);
       setLoading(false);
     });
     return unsub;
@@ -411,16 +433,28 @@ export default function UserLostAndFound() {
 
                     {/* View Results button for completed */}
                     {req.status === 'completed' && req.results.length > 0 && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setSelectedRequest(req); }}
-                        style={{
-                          marginTop: '0.75rem', padding: '6px 14px', borderRadius: '8px',
-                          background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)',
-                          color: '#4ade80', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
-                        }}
-                      >
-                        👁 View {req.results.length} Detection{req.results.length > 1 ? 's' : ''}
-                      </button>
+                      <div style={{ marginTop: '0.75rem' }}>
+                        <div style={{
+                          padding: '0.5rem 0.75rem', borderRadius: '8px', marginBottom: '0.5rem',
+                          background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.2)',
+                          display: 'inline-block',
+                        }}>
+                          <span style={{ color: '#4ade80', fontSize: '0.8rem', fontWeight: 600 }}>
+                            📍 Found at: {req.results[0]?.location || 'East Nada Gate'}
+                          </span>
+                        </div>
+                        <br />
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSelectedRequest(req); }}
+                          style={{
+                            padding: '6px 14px', borderRadius: '8px',
+                            background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)',
+                            color: '#4ade80', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
+                          }}
+                        >
+                          👁 View {req.results.length} Detection{req.results.length > 1 ? 's' : ''}
+                        </button>
+                      </div>
                     )}
 
                     {req.status === 'not_found' && (
@@ -472,34 +506,65 @@ export default function UserLostAndFound() {
               </div>
 
               {/* Detection grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-                {selectedRequest.results.map((det, idx) => (
-                  <div key={idx} style={{
-                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '12px', overflow: 'hidden',
-                  }}>
-                    <img
-                      src={det.frame_image}
-                      alt={`Detection ${idx + 1}`}
-                      style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover' }}
-                    />
-                    <div style={{ padding: '0.75rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                        <span style={{ color: '#4ade80', fontWeight: 700, fontSize: '0.8rem' }}>
-                          ✓ Match Found
-                        </span>
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>
-                          {det.timestamp_sec}s
-                        </span>
-                      </div>
-                      {det.engine && (
-                        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.7rem', margin: 0 }}>
-                          Engine: {det.engine} {det.score ? `(${(det.score * 100).toFixed(1)}%)` : ''}
-                        </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                {selectedRequest.results.map((det, idx) => {
+                  // Use frame_image if available, otherwise fetch from server using saved_file
+                  const imageSrc = det.frame_image || (det.saved_file ? `${API_URL}/api/view/${det.saved_file}` : null);
+                  
+                  return (
+                    <div key={idx} style={{
+                      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(74,222,128,0.2)',
+                      borderRadius: '12px', overflow: 'hidden',
+                    }}>
+                      {imageSrc ? (
+                        <img
+                          src={imageSrc}
+                          alt={`Detection ${idx + 1}`}
+                          style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: '100%', aspectRatio: '16/9', 
+                          background: 'rgba(74,222,128,0.1)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: '#4ade80', fontSize: '2rem'
+                        }}>
+                          ✓
+                        </div>
                       )}
+                      <div style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                          <span style={{ color: '#4ade80', fontWeight: 700, fontSize: '0.9rem' }}>
+                            ✓ Person Found!
+                          </span>
+                          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>
+                            {det.timestamp_sec}s into footage
+                          </span>
+                        </div>
+                        
+                        {/* Location info */}
+                        <div style={{
+                          padding: '0.6rem 0.8rem', borderRadius: '8px', marginBottom: '0.5rem',
+                          background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)',
+                        }}>
+                          <p style={{ color: '#60a5fa', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>
+                            📍 {det.location || 'East Nada Gate'}
+                          </p>
+                        </div>
+
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: 0 }}>
+                          ✅ Verified by: <span style={{ color: '#4ade80' }}>{det.verified_by || 'Admin'}</span>
+                        </p>
+                        
+                        {det.engine && (
+                          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.7rem', margin: '0.3rem 0 0' }}>
+                            Detection: {det.engine} {det.score ? `(${(det.score * 100).toFixed(0)}% match)` : ''}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -29,6 +29,8 @@ interface Detection {
   engine?: string;
   score?: number;
   saved_file?: string;
+  location?: string;
+  verified_by?: string;
 }
 
 interface StreamResult {
@@ -203,7 +205,7 @@ export default function AdminLostAndFound() {
 
       // Update Firestore with results (without base64 images to avoid size limits)
       const newStatus = result.person_found ? 'completed' : 'not_found';
-      // Only save metadata to Firestore, not the full images
+      // Only save metadata to Firestore, not the full images (but include location!)
       const resultsForFirestore = (result.detections || []).map(det => ({
         frame: det.frame,
         timestamp_sec: det.timestamp_sec,
@@ -211,6 +213,8 @@ export default function AdminLostAndFound() {
         engine: det.engine,
         score: det.score,
         saved_file: det.saved_file || null,
+        location: det.location || 'East Nada Gate',
+        verified_by: det.verified_by || 'Admin',
       }));
       
       await updateDoc(doc(db, 'search_requests', selectedRequest.id), {
