@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -66,8 +66,8 @@ export default function DoctorSignup() {
         role: 'doctor',
       });
 
-      // 3. Save doctor details to doctors collection
-      await addDoc(collection(db, 'doctors'), {
+      // 3. Save doctor details to doctors collection (use uid as doc ID)
+      await setDoc(doc(db, 'doctors', cred.user.uid), {
         name: name.trim(),
         degree: degree.trim(),
         specialization,

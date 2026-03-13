@@ -12,7 +12,6 @@ import ImageRecognition from './pages/ImageRecognition';
 import UserLostAndFound from './pages/UserLostAndFound';
 import AdminLostAndFound from './pages/AdminLostAndFound';
 import DoctorRegistration from './pages/DoctorRegistration';
-import DoctorAssistance from './pages/DoctorAssistance';
 import DoctorSignup from './pages/DoctorSignup';
 import PilgrimTracker from './pages/PilgrimTracker';
 import AIMap from './pages/AIMap';
@@ -29,6 +28,19 @@ import DisasterEmergency from './pages/disaster/DisasterEmergency';
 import DisasterSatellite from './pages/disaster/DisasterSatellite';
 import DisasterPilgrim from './pages/disaster/DisasterPilgrim';
 import DisasterApiTest from './pages/disaster/DisasterApiTest';
+
+import DoctorLayout from './components/DoctorLayout';
+import DoctorDashboard from './pages/doctor/DoctorDashboard';
+import DoctorVideoQueue from './pages/doctor/DoctorVideoQueue';
+import DoctorProfile from './pages/doctor/DoctorProfile';
+
+import MedicalLayout from './components/MedicalLayout';
+import MedicalDashboard from './pages/medical/MedicalDashboard';
+import MedicalVideoQueue from './pages/medical/MedicalVideoQueue';
+import MedicalDoctors from './pages/medical/MedicalDoctors';
+import MedicalHospitals from './pages/medical/MedicalHospitals';
+
+import EmergencyCall from './pages/EmergencyCall';
 
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
@@ -133,10 +145,25 @@ function App() {
               <Route path="api-test" element={<DisasterApiTest />} />
             </Route>
 
+            {/* Doctor Panel — nested routes with sidebar */}
+            <Route path="/doctor-panel" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorLayout /></ProtectedRoute>}>
+              <Route index element={<DoctorDashboard />} />
+              <Route path="video-queue" element={<DoctorVideoQueue />} />
+              <Route path="profile" element={<DoctorProfile />} />
+            </Route>
+
+            {/* Medical Admin Panel — nested routes with sidebar */}
+            <Route path="/medical-admin" element={<ProtectedRoute allowedRoles={['medical_admin']}><MedicalLayout /></ProtectedRoute>}>
+              <Route index element={<MedicalDashboard />} />
+              <Route path="video-queue" element={<MedicalVideoQueue />} />
+              <Route path="doctors" element={<MedicalDoctors />} />
+              <Route path="hospitals" element={<MedicalHospitals />} />
+            </Route>
+
             {/* User routes */}
             <Route path="/pilgrim-tracker" element={<ProtectedRoute allowedRoles={['user']}><PilgrimTracker /></ProtectedRoute>} />
-            <Route path="/doctor-assistance" element={<ProtectedRoute allowedRoles={['user', 'medical_admin', 'doctor']}><DoctorAssistance /></ProtectedRoute>} />
-            <Route path="/doctor-registration" element={<ProtectedRoute allowedRoles={['user']}><DoctorRegistration /></ProtectedRoute>} />
+            <Route path="/emergency-call" element={<ProtectedRoute allowedRoles={['user']}><EmergencyCall /></ProtectedRoute>} />
+            <Route path="/doctor-registration" element={<ProtectedRoute allowedRoles={['user', 'medical_admin']}><DoctorRegistration /></ProtectedRoute>} />
             <Route path="/ai-map" element={<ProtectedRoute allowedRoles={['user']}><AIMap /></ProtectedRoute>} />
 
             {/* Catch-all */}
