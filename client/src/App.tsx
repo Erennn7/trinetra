@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { DisasterDataProvider } from './context/DisasterDataContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Dashboard from './pages/Dashboard';
@@ -14,10 +15,20 @@ import DoctorRegistration from './pages/DoctorRegistration';
 import DoctorAssistance from './pages/DoctorAssistance';
 import DoctorSignup from './pages/DoctorSignup';
 import PilgrimTracker from './pages/PilgrimTracker';
-import DisasterPrediction from './pages/DisasterPrediction';
-import DisasterManagement from './pages/DisasterManagement';
 import AIMap from './pages/AIMap';
 import Analytics from './pages/Analytics';
+
+import DisasterLayout from './components/DisasterLayout';
+import DisasterDashboard from './pages/disaster/DisasterDashboard';
+import DisasterWeather from './pages/disaster/DisasterWeather';
+import DisasterEarthquake from './pages/disaster/DisasterEarthquake';
+import DisasterCrowd from './pages/disaster/DisasterCrowd';
+import DisasterTraffic from './pages/disaster/DisasterTraffic';
+import DisasterAlerts from './pages/disaster/DisasterAlerts';
+import DisasterEmergency from './pages/disaster/DisasterEmergency';
+import DisasterSatellite from './pages/disaster/DisasterSatellite';
+import DisasterPilgrim from './pages/disaster/DisasterPilgrim';
+import DisasterApiTest from './pages/disaster/DisasterApiTest';
 
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
@@ -97,12 +108,37 @@ function AppShell() {
             <Route path="/weapon-detection" element={<ProtectedRoute allowedRoles={['admin']}><WeaponDetection /></ProtectedRoute>} />
             <Route path="/crowd-detection" element={<ProtectedRoute allowedRoles={['admin']}><CrowdDetection /></ProtectedRoute>} />
             <Route path="/image-recognition" element={<ProtectedRoute allowedRoles={['admin']}><ImageRecognition /></ProtectedRoute>} />
-            <Route path="/disaster-prediction" element={<ProtectedRoute allowedRoles={['admin']}><DisasterPrediction /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute allowedRoles={['admin']}><Analytics /></ProtectedRoute>} />
+
+            {/* Disaster routes - shared across all authenticated panels */}
+            <Route path="/disaster-prediction" element={<ProtectedRoute allowedRoles={['admin', 'user', 'medical_admin', 'doctor']}><DisasterDataProvider><DisasterLayout /></DisasterDataProvider></ProtectedRoute>}>
+              <Route index element={<DisasterDashboard />} />
+              <Route path="weather" element={<DisasterWeather />} />
+              <Route path="earthquakes" element={<DisasterEarthquake />} />
+              <Route path="crowd" element={<DisasterCrowd />} />
+              <Route path="traffic" element={<DisasterTraffic />} />
+              <Route path="alerts" element={<DisasterAlerts />} />
+              <Route path="emergency" element={<DisasterEmergency />} />
+              <Route path="satellite" element={<DisasterSatellite />} />
+              <Route path="pilgrim" element={<DisasterPilgrim />} />
+              <Route path="api-test" element={<DisasterApiTest />} />
+            </Route>
+
+            <Route path="/disaster-management" element={<ProtectedRoute allowedRoles={['admin', 'user', 'medical_admin', 'doctor']}><DisasterDataProvider><DisasterLayout /></DisasterDataProvider></ProtectedRoute>}>
+              <Route index element={<DisasterDashboard />} />
+              <Route path="weather" element={<DisasterWeather />} />
+              <Route path="earthquakes" element={<DisasterEarthquake />} />
+              <Route path="crowd" element={<DisasterCrowd />} />
+              <Route path="traffic" element={<DisasterTraffic />} />
+              <Route path="alerts" element={<DisasterAlerts />} />
+              <Route path="emergency" element={<DisasterEmergency />} />
+              <Route path="satellite" element={<DisasterSatellite />} />
+              <Route path="pilgrim" element={<DisasterPilgrim />} />
+              <Route path="api-test" element={<DisasterApiTest />} />
+            </Route>
 
             {/* User routes */}
             <Route path="/pilgrim-tracker" element={<ProtectedRoute allowedRoles={['user']}><PilgrimTracker /></ProtectedRoute>} />
-            <Route path="/disaster-management" element={<ProtectedRoute allowedRoles={['user']}><DisasterManagement /></ProtectedRoute>} />
             <Route path="/doctor-assistance" element={<ProtectedRoute allowedRoles={['user', 'medical_admin', 'doctor']}><DoctorAssistance /></ProtectedRoute>} />
             <Route path="/doctor-registration" element={<ProtectedRoute allowedRoles={['user']}><DoctorRegistration /></ProtectedRoute>} />
             <Route path="/ai-map" element={<ProtectedRoute allowedRoles={['user']}><AIMap /></ProtectedRoute>} />

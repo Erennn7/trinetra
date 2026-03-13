@@ -81,9 +81,9 @@ const sidebarSections: SidebarSection[] = [
   },
   {
     title: 'Analysis',
-    roles: ['admin'],
+    roles: ['admin', 'user', 'medical_admin', 'doctor'],
     items: [
-      { id: 'disaster-prediction', label: 'Disaster Prediction', icon: CloudLightning, route: '/disaster-prediction', roles: ['admin'] },
+      { id: 'disaster-prediction', label: 'Disaster Prediction', icon: CloudLightning, route: '/disaster-prediction', roles: ['admin', 'user', 'medical_admin', 'doctor'] },
       { id: 'analytics', label: 'Analytics', icon: BarChart3, route: '/analytics', roles: ['admin'] },
     ],
   },
@@ -206,7 +206,7 @@ const featureModules: FeatureModule[] = [
   { id: 'crowd-detection', title: 'Crowd Detection', description: 'Real-time crowd density monitoring & heatmaps', icon: Users, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', badge: 'Live', badgeClass: 'text-blue-400 bg-blue-400/10', route: '/crowd-detection', roles: ['admin'] },
   { id: 'weapon-detection', title: 'Weapon Detection', description: 'Real-time weapon identification system', icon: Shield, iconClass: 'text-red-400', iconBg: 'bg-red-500/10', badge: 'Security', badgeClass: 'text-red-400 bg-red-400/10', route: '/weapon-detection', roles: ['admin'] },
   { id: 'image-recognition', title: 'Image Recognition', description: 'Advanced image processing & analysis', icon: Brain, iconClass: 'text-emerald-400', iconBg: 'bg-emerald-500/10', badge: 'AI', badgeClass: 'text-emerald-400 bg-emerald-400/10', route: '/image-recognition', roles: ['admin'] },
-  { id: 'disaster-prediction', title: 'Disaster Prediction', description: 'Disaster forecasting & early warning system', icon: CloudLightning, iconClass: 'text-amber-400', iconBg: 'bg-amber-500/10', badge: 'Prediction', badgeClass: 'text-amber-400 bg-amber-400/10', route: '/disaster-prediction', roles: ['admin'] },
+  { id: 'disaster-prediction', title: 'Disaster Prediction', description: 'Disaster forecasting & early warning system', icon: CloudLightning, iconClass: 'text-amber-400', iconBg: 'bg-amber-500/10', badge: 'Prediction', badgeClass: 'text-amber-400 bg-amber-400/10', route: '/disaster-prediction', roles: ['admin', 'user', 'medical_admin', 'doctor'] },
   { id: 'analytics', title: 'Analytics', description: 'Users, doctors & role-wise statistics', icon: BarChart3, iconClass: 'text-indigo-400', iconBg: 'bg-indigo-500/10', badge: 'Insights', badgeClass: 'text-indigo-400 bg-indigo-400/10', route: '/analytics', roles: ['admin'] },
   { id: 'report-missing', title: 'Report Missing Person', description: 'Submit a search request for a lost person', icon: Search, iconClass: 'text-violet-400', iconBg: 'bg-violet-500/10', badge: 'Search', badgeClass: 'text-violet-400 bg-violet-400/10', route: '/report-missing', roles: ['user'] },
   { id: 'pilgrim-tracker', title: 'Pilgrim Tracker', description: 'Real-time pilgrim location tracking', icon: MapPin, iconClass: 'text-blue-400', iconBg: 'bg-blue-500/10', badge: 'Tracking', badgeClass: 'text-blue-400 bg-blue-400/10', route: '/pilgrim-tracker', roles: ['user'] },
