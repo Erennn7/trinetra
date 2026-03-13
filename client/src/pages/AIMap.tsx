@@ -19,7 +19,7 @@ const DEFAULT_ANCHOR_QUERY = 'SKN Sinhgad College of Engineering, Korti, Pandhar
 const DEFAULT_ANCHOR_TITLE = 'SKN Sinhgad College of Engineering';
 const GOOGLE_MAPS_API_KEY = 'AIzaSyBIOC5weP0UHUucbi4EwAMAk-ollFzJ5nA';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent';
-const GEMINI_API_KEY = '';
+const GEMINI_API_KEY = 'AIzaSyBClIibmNgLmQHRlgZ5Los7Uc30IjGDozY';
 
 // --- Multilingual Config ---
 type LangCode = 'en' | 'hi' | 'bn' | 'ta' | 'te' | 'mr' | 'gu' | 'kn' | 'ur' | 'pa';
@@ -762,6 +762,25 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
   const speechSynthRef = useRef<SpeechSynthesis | null>(null);
   const speechRecRef = useRef<BrowserSpeechRecognition | null>(null);
 
+  const resolveTtsVoice = (ttsLang: string) => {
+    const synth = speechSynthRef.current;
+    if (!synth) return { lang: ttsLang, voice: null as SpeechSynthesisVoice | null };
+
+    const voices = synth.getVoices();
+    if (!voices.length) return { lang: ttsLang, voice: null as SpeechSynthesisVoice | null };
+
+    const wanted = ttsLang.toLowerCase();
+    const base = wanted.split('-')[0];
+
+    const exact = voices.find(v => v.lang.toLowerCase() === wanted) || null;
+    if (exact) return { lang: exact.lang, voice: exact };
+
+    const baseMatch = voices.find(v => v.lang.toLowerCase().startsWith(`${base}-`)) || null;
+    if (baseMatch) return { lang: baseMatch.lang, voice: baseMatch };
+
+    return { lang: ttsLang, voice: null as SpeechSynthesisVoice | null };
+  };
+
   // --- Offline & Cache Init ---
   useEffect(() => {
     initializeOfflineSupport();
@@ -1487,7 +1506,10 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
     if (!speechSynthRef.current) return;
     speechSynthRef.current.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = LANGUAGES.find(l => l.code === language)?.ttsLang || 'en-IN';
+    const desiredLang = LANGUAGES.find(l => l.code === language)?.ttsLang || 'en-IN';
+    const { lang: resolvedLang, voice } = resolveTtsVoice(desiredLang);
+    u.lang = resolvedLang;
+    if (voice) u.voice = voice;
     u.rate = 0.9; u.volume = 0.8;
     u.onstart = () => setIsSpeaking(true);
     u.onend = () => setIsSpeaking(false);
@@ -1498,7 +1520,10 @@ export default function AIMap({ crowdPoints = [] }: { crowdPoints?: { lat: numbe
     if (!speechSynthRef.current) return;
     speechSynthRef.current.cancel();
     const u = new SpeechSynthesisUtterance(msg);
-    u.lang = LANGUAGES.find(l => l.code === language)?.ttsLang || 'en-IN';
+    const desiredLang = LANGUAGES.find(l => l.code === language)?.ttsLang || 'en-IN';
+    const { lang: resolvedLang, voice } = resolveTtsVoice(desiredLang);
+    u.lang = resolvedLang;
+    if (voice) u.voice = voice;
     u.rate = 1.0; u.volume = 0.6;
     u.onstart = () => setIsSpeaking(true);
     u.onend = () => setIsSpeaking(false);

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -70,13 +70,15 @@ function NavBar() {
   );
 }
 
-function App() {
+function AppShell() {
+  const location = useLocation();
+  const isAIMapRoute = location.pathname === '/ai-map';
+
   return (
-    <BrowserRouter>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <AuthProvider>
         <div style={{ minHeight: '100vh', background: 'hsl(var(--background))' }}>
-          <NavBar />
+          {!isAIMapRoute && <NavBar />}
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
@@ -108,12 +110,19 @@ function App() {
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
-          <Footer2 />
-          <ChatbotPopup/>
-          <VoiceNavigator />
+          {!isAIMapRoute && <Footer2 />}
+          {!isAIMapRoute && <ChatbotPopup/>}
+          {!isAIMapRoute && <VoiceNavigator />}
         </div>
       </AuthProvider>
-      </ThemeProvider>
+    </ThemeProvider>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppShell />
     </BrowserRouter>
   );
 }
