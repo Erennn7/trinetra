@@ -1,5 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft, ShieldAlert, Radio, Upload, Play, AlertTriangle,
+  CheckCircle2, XCircle, Loader2, Target, Crosshair,
+  Flame, Swords, Eye, RefreshCw
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const GLASS = "bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 interface PersonImage {
@@ -37,12 +45,12 @@ interface AnalysisResponse {
 const API_URL = 'http://localhost:5002';
 const STREAM_WEBRTC_URL = 'http://localhost:8889/webcam/';
 
-const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string; icon: string; label: string }> = {
-  safe:     { color: '#22c55e', bg: 'rgba(34,197,94,0.10)',  border: 'rgba(34,197,94,0.3)',  icon: '✓', label: 'Safe' },
-  anomaly:  { color: '#f59e0b', bg: 'rgba(245,158,11,0.10)', border: 'rgba(245,158,11,0.3)', icon: '⚠', label: 'Anomaly' },
-  danger:   { color: '#ef4444', bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.3)',  icon: '⛔', label: 'Danger' },
-  critical: { color: '#dc2626', bg: 'rgba(220,38,38,0.15)',  border: 'rgba(220,38,38,0.5)',  icon: '🚨', label: 'Critical' },
-  error:    { color: '#6b7280', bg: 'rgba(107,114,128,0.10)', border: 'rgba(107,114,128,0.3)', icon: '?', label: 'Error' },
+const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string; icon: any; label: string }> = {
+  safe:     { color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30', icon: CheckCircle2, label: 'Safe' },
+  anomaly:  { color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', icon: AlertTriangle, label: 'Anomaly' },
+  danger:   { color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/30', icon: XCircle, label: 'Danger' },
+  critical: { color: 'text-red-600', bg: 'bg-red-600/15', border: 'border-red-600/50', icon: ShieldAlert, label: 'Critical' },
+  error:    { color: 'text-gray-500', bg: 'bg-gray-500/10', border: 'border-gray-500/30', icon: AlertTriangle, label: 'Error' },
 };
 
 const ALLOWED_EXT = ['mp4', 'avi', 'mov', 'mkv', 'webm', 'jpg', 'jpeg', 'png'];
@@ -50,26 +58,30 @@ const ALLOWED_EXT = ['mp4', 'avi', 'mov', 'mkv', 'webm', 'jpg', 'jpeg', 'png'];
 // ─── Utility Components ─────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.error;
+  const Icon = cfg.icon;
   return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-      fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-      color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}`,
-      borderRadius: '6px', padding: '3px 10px',
-    }}>
-      <span>{cfg.icon}</span> {cfg.label}
+    <span className={cn(
+      "inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border",
+      cfg.color, cfg.bg, cfg.border
+    )}>
+      <Icon className="h-3.5 w-3.5" />
+      {cfg.label}
     </span>
   );
 }
 
-function TagPill({ label, color = '#a78bfa' }: { label: string; color?: string }) {
+function TagPill({ label, variant = 'default' }: { label: string; variant?: 'default' | 'danger' | 'warning' | 'fire' }) {
+  const styles = {
+    default: "text-rose-400 bg-rose-400/10 border-rose-400/30",
+    danger: "text-red-500 bg-red-500/10 border-red-500/30",
+    warning: "text-amber-500 bg-amber-500/10 border-amber-500/30",
+    fire: "text-orange-500 bg-orange-500/10 border-orange-500/30",
+  };
   return (
-    <span style={{
-      display: 'inline-block', fontSize: '0.6rem', fontWeight: 600,
-      letterSpacing: '0.12em', textTransform: 'uppercase',
-      color, background: `${color}18`, border: `1px solid ${color}40`,
-      borderRadius: '4px', padding: '2px 8px',
-    }}>
+    <span className={cn(
+      "inline-flex items-center text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border",
+      styles[variant]
+    )}>
       {label}
     </span>
   );
@@ -293,60 +305,46 @@ export default function WeaponDetection() {
 
   // ── Render ─────────────────────────────────────────────────────────
   return (
-    <div style={{ paddingTop: '5rem', minHeight: '100vh', background: '#050508' }}>
+    <div className="pt-20 min-h-screen bg-background pb-20">
       {/* Header */}
-      <div style={{ maxWidth: mode === 'stream' ? '1600px' : '1200px', margin: '0 auto', padding: '2rem 2rem 0', transition: 'max-width 0.3s' }}>
-        <button
-          onClick={() => navigate('/dashboard')}
-          style={{
-            background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
-            color: 'rgba(255,255,255,0.5)', padding: '6px 14px', fontSize: '0.75rem',
-            cursor: 'pointer', marginBottom: '1.5rem', transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)';
-            e.currentTarget.style.color = '#fca5a5';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-            e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
-          }}
-        >
-          ← Back to Dashboard
-        </button>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.3rem' }}>
-          <div style={{
-            width: '42px', height: '42px', borderRadius: '12px',
-            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem',
-          }}>
-            🔫
-          </div>
+      <header className={cn('rounded-xl h-24 lg:h-28 flex flex-col justify-center px-5 lg:px-8 mb-6 relative overflow-hidden mx-4 sm:mx-6 lg:mx-8 max-w-[1600px] xl:mx-auto', GLASS)}>
+        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-transparent pointer-events-none" />
+        <div className="flex items-center gap-4 lg:gap-6 relative z-10">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="h-10 w-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-muted-foreground hover:text-white hover:bg-violet-500/20 hover:border-violet-500/30 transition-all"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="h-10 w-px bg-white/10 hidden sm:block" />
           <div>
-            <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem', letterSpacing: '0.25em', textTransform: 'uppercase', margin: 0 }}>
-              Security Module
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-violet-500/20 flex items-center justify-center shadow-lg shadow-violet-500/5">
+                <Target className="h-5 w-5 text-violet-400" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-violet-400/80 mb-0.5">
+                  Security Module
+                </p>
+                <h1 className="text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                  Weapon & Threat Detection
+                </h1>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2 hidden md:block max-w-2xl">
+              Scan live CCTV streams or upload footage. AI analyzes each frame for weapons, fighting, fire, and suspicious activity.
             </p>
-            <h1 style={{ color: '#fff', fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>
-              Weapon & Threat Detection
-            </h1>
           </div>
         </div>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', marginTop: '0.25rem', marginBottom: '1.5rem' }}>
-          Scan the live CCTV stream or upload footage. AI analyzes each frame for weapons, fighting, fire, and suspicious activity.
-        </p>
-        <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(239,68,68,0.3), transparent)' }} />
-      </div>
+      </header>
 
-      <div style={{ maxWidth: mode === 'stream' ? '1600px' : '1200px', margin: '0 auto', padding: '2rem', transition: 'max-width 0.3s' }}>
-        <div style={{
-          display: mode === 'stream' ? 'grid' : 'block',
-          gridTemplateColumns: mode === 'stream' ? '1fr 400px' : '1fr',
-          gap: '1.5rem',
-          alignItems: 'start',
-        }}>
+      <div className={cn("mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300", mode === 'stream' ? 'max-w-[1600px]' : 'max-w-[1200px]')}>
+        <div className={cn(
+          "grid gap-6 lg:gap-8 items-start",
+          mode === 'stream' ? "grid-cols-1 lg:grid-cols-[1fr_400px]" : "grid-cols-1"
+        )}>
           {/* ═══ Left Column — Controls & Results ═══ */}
-          <div>
+          <div className="space-y-6">
         {/* ── Mode Selector ───────────────────────────────────────── */}
         {!result && (
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
@@ -357,7 +355,7 @@ export default function WeaponDetection() {
                 style={{
                   flex: 1, padding: '12px', borderRadius: '10px', border: 'none',
                   background: mode === m
-                    ? (m === 'stream' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #8b5cf6, #6d28d9)')
+                    ? 'linear-gradient(135deg, #8b5cf6, #6d28d9)'
                     : 'rgba(255,255,255,0.04)',
                   color: mode === m ? '#fff' : 'rgba(255,255,255,0.4)',
                   fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.3s',
@@ -379,9 +377,9 @@ export default function WeaponDetection() {
               onDrop={onDrop}
               onClick={() => fileInputRef.current?.click()}
               style={{
-                border: `2px dashed ${dragActive ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
+                border: `2px dashed ${dragActive ? '#8b5cf6' : 'rgba(255,255,255,0.1)'}`,
                 borderRadius: '16px', padding: '3rem 2rem',
-                background: dragActive ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)',
+                background: dragActive ? 'rgba(139,92,246,0.05)' : 'rgba(255,255,255,0.02)',
                 cursor: 'pointer', transition: 'all 0.3s', textAlign: 'center',
                 minHeight: '280px', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
@@ -403,7 +401,7 @@ export default function WeaponDetection() {
                   <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginTop: '0.3rem' }}>
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
-                  <p style={{ color: 'rgba(239,68,68,0.7)', fontSize: '0.7rem', marginTop: '0.5rem' }}>
+                  <p style={{ color: 'rgba(139,92,246,0.7)', fontSize: '0.7rem', marginTop: '0.5rem' }}>
                     Click to change file
                   </p>
                 </>
@@ -462,7 +460,7 @@ export default function WeaponDetection() {
               <input
                 type="range" min="10" max="120" step="5" value={scanDuration}
                 onChange={(e) => setScanDuration(parseInt(e.target.value))}
-                style={{ width: '100%', marginTop: '0.4rem', accentColor: '#ef4444' }}
+                style={{ width: '100%', marginTop: '0.4rem', accentColor: '#8b5cf6' }}
               />
               <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem', margin: '0.2rem 0 0' }}>
                 How long to scan the live stream
@@ -475,7 +473,7 @@ export default function WeaponDetection() {
               <input
                 type="range" min="1" max="10" step="1" value={intervalSec}
                 onChange={(e) => setIntervalSec(parseInt(e.target.value))}
-                style={{ width: '100%', marginTop: '0.4rem', accentColor: '#ef4444' }}
+                style={{ width: '100%', marginTop: '0.4rem', accentColor: '#8b5cf6' }}
               />
               <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem', margin: '0.2rem 0 0' }}>
                 Seconds between each Gemini AI snapshot
@@ -493,10 +491,8 @@ export default function WeaponDetection() {
               style={{
                 flex: 1, padding: '14px 28px', borderRadius: '12px', border: 'none',
                 background: loading
-                  ? 'rgba(239,68,68,0.3)'
-                  : mode === 'stream'
-                    ? 'linear-gradient(135deg, #ef4444, #dc2626)'
-                    : 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+                  ? 'rgba(139,92,246,0.3)'
+                  : 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
                 color: '#fff', fontWeight: 700, fontSize: '0.95rem',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s', letterSpacing: '0.03em',
@@ -531,7 +527,7 @@ export default function WeaponDetection() {
             }}>
               <div style={{
                 height: '100%', borderRadius: '3px',
-                background: 'linear-gradient(90deg, #ef4444, #f59e0b)',
+                background: 'linear-gradient(90deg, #8b5cf6, #a78bfa)',
                 width: `${progress}%`, transition: 'width 0.5s ease',
               }} />
             </div>
@@ -547,9 +543,9 @@ export default function WeaponDetection() {
         {error && (
           <div style={{
             padding: '1rem 1.5rem', borderRadius: '12px', marginBottom: '2rem',
-            background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)',
+            background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.3)',
           }}>
-            <p style={{ color: '#ef4444', margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>
+            <p style={{ color: '#a78bfa', margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>
               ⚠️ {error}
             </p>
           </div>
@@ -559,148 +555,123 @@ export default function WeaponDetection() {
             RESULTS (shared for both modes)
            ══════════════════════════════════════════════════════════ */}
         {result && stats && (
-          <>
+          <div className="space-y-6">
             {/* Overall summary bar */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '1.25rem 1.5rem', borderRadius: '14px', marginBottom: '1.5rem',
-              background: STATUS_CONFIG[overallStatus || 'safe'].bg,
-              border: `1px solid ${STATUS_CONFIG[overallStatus || 'safe'].border}`,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontSize: '2rem' }}>
+            <div className={cn(
+              "flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border",
+              STATUS_CONFIG[overallStatus || 'safe'].bg,
+              STATUS_CONFIG[overallStatus || 'safe'].border
+            )}>
+              <div className="flex items-center gap-4">
+                <span className="text-3xl">
                   {overallStatus === 'critical' ? '🚨' : overallStatus === 'danger' ? '⛔' : overallStatus === 'anomaly' ? '⚠️' : '✅'}
                 </span>
                 <div>
-                  <p style={{ color: '#fff', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
+                  <p className="text-white text-lg font-bold">
                     {overallStatus === 'safe' ? 'All Clear — No Threats Detected' :
                      overallStatus === 'anomaly' ? 'Suspicious Activity Detected' :
                      overallStatus === 'danger' ? 'Threats Detected!' :
                      'Critical Threats Detected!'}
                   </p>
-                  <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.78rem', margin: '0.15rem 0 0' }}>
-                    {stats.total} frames analyzed · {result.threats_detected} threat(s) found
+                  <p className="text-white/60 text-sm mt-0.5">
+                    {stats.total} frames analyzed &bull; {result.threats_detected} threat(s) found
                   </p>
                 </div>
               </div>
               <button
                 onClick={reset}
-                style={{
-                  padding: '8px 18px', borderRadius: '8px',
-                  border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)',
-                  color: '#fff', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer',
-                }}
+                className="px-5 py-2.5 rounded-lg border border-white/10 bg-black/20 hover:bg-white/10 text-white text-sm font-bold transition-all"
               >
                 New Analysis
               </button>
             </div>
 
             {/* Stat cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
               {[
-                { label: 'Total Frames', value: stats.total, color: '#8b5cf6' },
-                { label: 'Safe', value: stats.safe, color: '#22c55e' },
-                { label: 'Anomaly', value: stats.anomaly, color: '#f59e0b' },
-                { label: 'Danger', value: stats.danger, color: '#ef4444' },
-                { label: 'Critical', value: stats.critical, color: '#dc2626' },
-                { label: 'Fighting', value: stats.fightingFrames, color: '#f97316' },
-                { label: 'Fire', value: stats.fireFrames, color: '#ef4444' },
+                { label: 'Frames', value: stats.total, color: 'text-violet-400' },
+                { label: 'Safe', value: stats.safe, color: 'text-green-500' },
+                { label: 'Anomaly', value: stats.anomaly, color: 'text-amber-500' },
+                { label: 'Danger', value: stats.danger, color: 'text-rose-500' },
+                { label: 'Critical', value: stats.critical, color: 'text-red-600' },
+                { label: 'Fighting', value: stats.fightingFrames, color: 'text-orange-500' },
+                { label: 'Fire', value: stats.fireFrames, color: 'text-red-500' },
               ].map((s) => (
-                <div key={s.label} style={{
-                  padding: '1rem', borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
-                  textAlign: 'center',
-                }}>
-                  <p style={{ color: s.color, fontSize: '1.6rem', fontWeight: 800, margin: 0 }}>{s.value}</p>
-                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', margin: '0.2rem 0 0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{s.label}</p>
+                <div key={s.label} className={cn("p-4 rounded-xl text-center flex flex-col items-center justify-center", GLASS)}>
+                  <p className={cn("text-2xl font-bold mb-1", s.color)}>{s.value}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{s.label}</p>
                 </div>
               ))}
             </div>
 
             {/* Weapons found */}
             {stats.weaponsFound.length > 0 && (
-              <div style={{
-                padding: '1rem 1.5rem', borderRadius: '12px', marginBottom: '2rem',
-                background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)',
-              }}>
-                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', margin: '0 0 0.5rem', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-                  Weapons Identified
+              <div className="p-5 rounded-xl border border-rose-500/30 bg-rose-500/10">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-rose-400 mb-3 flex items-center gap-2">
+                  <Swords className="h-4 w-4" /> Weapons Identified
                 </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <div className="flex flex-wrap gap-2">
                   {stats.weaponsFound.map((w) => (
-                    <TagPill key={w} label={w} color="#ef4444" />
+                    <TagPill key={w} label={w} variant="danger" />
                   ))}
                 </div>
               </div>
             )}
 
             {/* Frame detail + timeline */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.5rem' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
               {/* Left — Selected frame detail */}
-              <div style={{
-                borderRadius: '14px', padding: '1.5rem',
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
-              }}>
+              <div className={cn("rounded-xl p-6 flex flex-col", GLASS)}>
                 {selectedFrame ? (
                   <>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
                       <div>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 0.25rem' }}>
-                          Frame #{selectedFrame.frame} · {selectedFrame.timestamp_sec}s
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">
+                          Frame #{selectedFrame.frame} &bull; {selectedFrame.timestamp_sec}s
                         </p>
                         <StatusBadge status={selectedFrame.analysis.status} />
                       </div>
-                      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                        {selectedFrame.analysis.weapons.map((w) => <TagPill key={w} label={w} color="#ef4444" />)}
-                        {selectedFrame.analysis.fighting_detected && <TagPill label="Fighting" color="#f97316" />}
-                        {selectedFrame.analysis.fire_detected && <TagPill label="Fire" color="#ef4444" />}
-                        {selectedFrame.analysis.suspicious_activity && <TagPill label="Suspicious" color="#f59e0b" />}
+                      <div className="flex gap-2 flex-wrap">
+                        {selectedFrame.analysis.weapons.map((w) => <TagPill key={w} label={w} variant="danger" />)}
+                        {selectedFrame.analysis.fighting_detected && <TagPill label="Fighting" variant="warning" />}
+                        {selectedFrame.analysis.fire_detected && <TagPill label="Fire" variant="fire" />}
+                        {selectedFrame.analysis.suspicious_activity && <TagPill label="Suspicious" variant="warning" />}
                       </div>
                     </div>
 
                     {/* Screenshot */}
                     {selectedFrame.frame_screenshot && (
-                      <div style={{
-                        borderRadius: '10px', overflow: 'hidden', marginBottom: '1rem',
-                        border: '1px solid rgba(255,255,255,0.08)', background: '#000',
-                      }}>
+                      <div className="rounded-xl overflow-hidden border border-white/10 bg-black mb-5">
                         <img
                           src={selectedFrame.frame_screenshot}
                           alt={`Frame ${selectedFrame.frame}`}
-                          style={{ width: '100%', display: 'block' }}
+                          className="w-full object-contain"
                         />
                       </div>
                     )}
 
                     {/* Summary */}
-                    <div style={{
-                      padding: '1rem', borderRadius: '10px',
-                      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
-                      marginBottom: '1rem',
-                    }}>
-                      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 0.4rem' }}>
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-5">
+                      <p className="text-[10px] uppercase tracking-widest font-bold text-violet-400 mb-2">
                         AI Analysis Summary
                       </p>
-                      <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.88rem', margin: 0, lineHeight: 1.6 }}>
+                      <p className="text-sm text-white/80 leading-relaxed">
                         {selectedFrame.analysis.summary}
                       </p>
                     </div>
 
                     {/* Person images */}
                     {selectedFrame.person_images && selectedFrame.person_images.length > 0 && (
-                      <div>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 0.6rem' }}>
-                          Detected Persons
+                      <div className="mt-auto">
+                        <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-3 flex items-center gap-2">
+                          <Users className="h-3 w-3" /> Detected Persons
                         </p>
-                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        <div className="flex gap-3 flex-wrap">
                           {selectedFrame.person_images.map((p, i) => (
-                            <div key={i} style={{
-                              borderRadius: '10px', overflow: 'hidden',
-                              border: '1px solid rgba(239,68,68,0.3)', width: '120px',
-                            }}>
-                              <img src={p.image} alt={`Person ${i + 1}`} style={{ width: '100%', display: 'block' }} />
-                              <div style={{ padding: '0.3rem 0.5rem', background: 'rgba(0,0,0,0.6)' }}>
-                                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.6rem', margin: 0 }}>
+                            <div key={i} className="rounded-lg overflow-hidden border border-rose-500/30 w-[100px] relative group">
+                              <img src={p.image} alt={`Person ${i + 1}`} className="w-full aspect-[3/4] object-cover" />
+                              <div className="absolute inset-x-0 bottom-0 p-1.5 bg-black/80 backdrop-blur-sm">
+                                <p className="text-[9px] text-white/80 font-bold text-center">
                                   Conf: {(p.confidence * 100).toFixed(0)}%
                                 </p>
                               </div>
@@ -711,175 +682,119 @@ export default function WeaponDetection() {
                     )}
                   </>
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem' }}>Select a frame from the timeline →</p>
+                  <div className="flex-1 flex flex-col items-center justify-center text-center py-12 opacity-50">
+                    <Eye className="h-12 w-12 mb-4" />
+                    <p className="text-sm">Select a frame from the timeline</p>
                   </div>
                 )}
               </div>
 
               {/* Right — Timeline */}
-              <div style={{
-                borderRadius: '14px', padding: '1rem',
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
-                maxHeight: '600px', overflowY: 'auto',
-              }}>
-                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 0.75rem', padding: '0 0.25rem' }}>
-                  Frame Timeline
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {result.results.map((frame) => {
-                    const isSelected = selectedFrame?.frame === frame.frame;
-                    const cfg = STATUS_CONFIG[frame.analysis.status] || STATUS_CONFIG.error;
-                    return (
-                      <button
-                        key={frame.frame}
-                        onClick={() => setSelectedFrame(frame)}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: '0.75rem',
-                          padding: '0.65rem 0.75rem', borderRadius: '10px',
-                          border: isSelected ? `1px solid ${cfg.border}` : '1px solid rgba(255,255,255,0.04)',
-                          background: isSelected ? cfg.bg : 'transparent',
-                          cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left',
-                          width: '100%',
-                        }}
-                      >
-                        <div style={{
-                          width: '8px', height: '8px', borderRadius: '50%',
-                          background: cfg.color, flexShrink: 0,
-                          boxShadow: frame.analysis.status !== 'safe' ? `0 0 6px ${cfg.color}` : 'none',
-                        }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 600, margin: 0 }}>
-                            {frame.timestamp_sec}s
-                          </p>
-                          <p style={{
-                            color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', margin: '0.1rem 0 0',
-                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                          }}>
-                            {frame.analysis.summary}
-                          </p>
-                        </div>
-                        <StatusBadge status={frame.analysis.status} />
-                      </button>
-                    );
-                  })}
+              <div className={cn("rounded-xl p-4 max-h-[700px] overflow-y-auto custom-scrollbar flex flex-col gap-2", GLASS)}>
+                <div className="sticky top-0 bg-background/80 backdrop-blur-md pb-2 mb-2 z-10 -mt-2 pt-2 border-b border-white/10">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground px-2">
+                    Frame Timeline
+                  </p>
                 </div>
+                {result.results.map((frame) => {
+                  const isSelected = selectedFrame?.frame === frame.frame;
+                  const cfg = STATUS_CONFIG[frame.analysis.status] || STATUS_CONFIG.error;
+                  return (
+                    <button
+                      key={frame.frame}
+                      onClick={() => setSelectedFrame(frame)}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-lg border transition-all text-left w-full group",
+                        isSelected ? cn(cfg.bg, cfg.border) : "border-white/5 hover:bg-white/5"
+                      )}
+                    >
+                      <div className={cn(
+                        "h-2 w-2 rounded-full shrink-0 transition-all",
+                        cfg.color.replace('text-', 'bg-'),
+                        frame.analysis.status !== 'safe' && !isSelected && "animate-pulse"
+                      )} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-white mb-0.5">
+                          {frame.timestamp_sec}s
+                        </p>
+                        <p className="text-[10px] text-white/40 truncate">
+                          {frame.analysis.summary}
+                        </p>
+                      </div>
+                      <div className="shrink-0 scale-90 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <StatusBadge status={frame.analysis.status} />
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          </>
+          </div>
         )}
           </div>
 
           {/* ═══ Right Column — Live CCTV Stream ═══ */}
           {mode === 'stream' && (
-            <div style={{
-              position: 'sticky', top: '6rem',
-              borderRadius: '16px', overflow: 'hidden',
-              border: '1px solid rgba(239,68,68,0.2)',
-              background: '#0a0b12',
-            }}>
+            <div className={cn("sticky top-28 rounded-xl overflow-hidden flex flex-col", GLASS)}>
               {/* Header */}
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0.75rem 1rem',
-                background: 'rgba(239,68,68,0.06)',
-                borderBottom: '1px solid rgba(239,68,68,0.15)',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{
-                    width: '8px', height: '8px', borderRadius: '50%',
-                    background: streamOnline ? '#22c55e' : '#ef4444',
-                    boxShadow: streamOnline ? '0 0 8px #22c55e' : '0 0 8px #ef4444',
-                    animation: streamOnline ? 'pulse-dot 1.6s ease-in-out infinite' : 'none',
-                  }} />
-                  <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                    {streamOnline ? 'Live' : 'Offline'}
+              <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
+                <div className="flex items-center gap-2">
+                  <div className={cn(
+                    "h-2 w-2 rounded-full",
+                    streamOnline ? "bg-green-500 shadow-[0_0_8px_#22c55e] animate-pulse" : "bg-violet-500 shadow-[0_0_8px_#8b5cf6]"
+                  )} />
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-white/80">
+                    {streamOnline ? 'Live Feed' : 'Offline'}
                   </span>
                 </div>
-                <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem' }}>
-                  CCTV — webcam
+                <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">
+                  CCTV
                 </span>
               </div>
 
               {/* Video player */}
-              <div style={{ position: 'relative', background: '#000', minHeight: '240px' }}>
+              <div className="relative bg-black aspect-video flex-1 min-h-[240px]">
                 <iframe
                   key={iframeReloadKey}
                   src={STREAM_WEBRTC_URL}
                   allow="autoplay"
-                  style={{ width: '100%', height: '240px', display: 'block', border: 'none' }}
+                  className="w-full h-full border-none pointer-events-none"
                 />
 
                 {/* Offline overlay */}
                 {!streamOnline && (
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'rgba(0,0,0,0.85)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    gap: '0.75rem',
-                  }}>
-                    <div style={{ fontSize: '2.5rem', opacity: 0.3 }}>📡</div>
-                    <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>
+                  <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-3 p-6 text-center">
+                    <Radio className="h-10 w-10 text-white/20 mb-2" />
+                    <p className="text-sm font-bold text-white/60 uppercase tracking-widest">
                       Stream Offline
                     </p>
-                    <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.68rem', margin: 0, textAlign: 'center', padding: '0 1rem' }}>
-                      Make sure MediaMTX & ffmpeg are running.
-                      <br />Retrying every 5 seconds…
+                    <p className="text-[10px] text-white/30 max-w-[200px] leading-relaxed">
+                      Make sure MediaMTX & ffmpeg are running. Retrying...
                     </p>
                   </div>
                 )}
 
                 {/* Scanning overlay */}
                 {loading && mode === 'stream' && (
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'rgba(0,0,0,0.5)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    backdropFilter: 'blur(2px)',
-                  }}>
-                    <div style={{
-                      width: '50px', height: '50px', border: '3px solid rgba(239,68,68,0.3)',
-                      borderTop: '3px solid #ef4444', borderRadius: '50%',
-                      animation: 'spin 1s linear infinite',
-                    }} />
-                    <p style={{ color: '#fca5a5', fontSize: '0.78rem', fontWeight: 600, marginTop: '0.75rem' }}>
-                      Scanning stream…
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center">
+                    <Loader2 className="h-10 w-10 text-violet-500 animate-spin mb-3" />
+                    <p className="text-xs font-bold text-violet-400 uppercase tracking-widest">
+                      Scanning stream
                     </p>
                   </div>
                 )}
               </div>
 
               {/* Info footer */}
-              <div style={{
-                padding: '0.6rem 1rem',
-                background: 'rgba(255,255,255,0.02)',
-                borderTop: '1px solid rgba(255,255,255,0.04)',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              }}>
-                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
-                  rtsp://localhost:8554/webcam
-                </span>
-                <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.6rem' }}>
-                  WebRTC · 720p
-                </span>
+              <div className="p-3 bg-white/5 border-t border-white/10 flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-white/30">
+                <span>rtsp://localhost:8554/webcam</span>
+                <span>WebRTC &bull; 720p</span>
               </div>
             </div>
           )}
 
         </div>{/* end grid */}
       </div>{/* end max-width container */}
-
-      {/* Keyframes */}
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes pulse-dot {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-      `}</style>
     </div>
   );
 }
