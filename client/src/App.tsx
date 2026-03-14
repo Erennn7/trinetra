@@ -30,6 +30,19 @@ import DisasterSatellite from './pages/disaster/DisasterSatellite';
 import DisasterPilgrim from './pages/disaster/DisasterPilgrim';
 import DisasterApiTest from './pages/disaster/DisasterApiTest';
 
+import DoctorLayout from './components/DoctorLayout';
+import DoctorDashboard from './pages/doctor/DoctorDashboard';
+import DoctorVideoQueue from './pages/doctor/DoctorVideoQueue';
+import DoctorProfile from './pages/doctor/DoctorProfile';
+
+import MedicalLayout from './components/MedicalLayout';
+import MedicalDashboard from './pages/medical/MedicalDashboard';
+import MedicalVideoQueue from './pages/medical/MedicalVideoQueue';
+import MedicalDoctors from './pages/medical/MedicalDoctors';
+import MedicalHospitals from './pages/medical/MedicalHospitals';
+
+import EmergencyCall from './pages/EmergencyCall';
+
 import GooeyNav from './components/GooeyNav';
 import { Footer2 } from './components/Footer2';
 import { ThemeProvider } from "@/components/theme-provider"
@@ -139,9 +152,25 @@ function AppShell() {
 
             {/* User routes */}
             <Route path="/pilgrim-tracker" element={<ProtectedRoute allowedRoles={['user']}><PilgrimTracker /></ProtectedRoute>} />
+            <Route path="/emergency-call" element={<ProtectedRoute allowedRoles={['user']}><EmergencyCall /></ProtectedRoute>} />
             <Route path="/doctor-assistance" element={<ProtectedRoute allowedRoles={['user', 'medical_admin', 'doctor']}><DoctorAssistance /></ProtectedRoute>} />
             <Route path="/doctor-registration" element={<ProtectedRoute allowedRoles={['user']}><DoctorRegistration /></ProtectedRoute>} />
             <Route path="/ai-map" element={<ProtectedRoute allowedRoles={['user']}><AIMap /></ProtectedRoute>} />
+
+            {/* Doctor panel routes */}
+            <Route path="/doctor-panel" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorLayout /></ProtectedRoute>}>
+              <Route index element={<DoctorDashboard />} />
+              <Route path="video-queue" element={<DoctorVideoQueue />} />
+              <Route path="profile" element={<DoctorProfile />} />
+            </Route>
+
+            {/* Medical admin routes */}
+            <Route path="/medical-admin" element={<ProtectedRoute allowedRoles={['medical_admin']}><MedicalLayout /></ProtectedRoute>}>
+              <Route index element={<MedicalDashboard />} />
+              <Route path="video-queue" element={<MedicalVideoQueue />} />
+              <Route path="doctors" element={<MedicalDoctors />} />
+              <Route path="hospitals" element={<MedicalHospitals />} />
+            </Route>
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
